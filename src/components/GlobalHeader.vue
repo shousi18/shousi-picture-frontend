@@ -54,17 +54,18 @@ import { routes } from '@/router/routes.ts'
 import checkAccess from '@/access/checkAccess.ts'
 
 const loginUserStore = useLoginUserStore()
-const current = ref<string[]>(["/"])
+const current = ref<string[]>(['/'])
 const router = useRouter()
 
 // 把路由项转换为菜单项
 const menuToRouteItem = (item: any) => {
-  const isHome = (item.path === '/')
+  const isHome = item.path === '/'
   return {
     key: item.path,
     label: item.name,
     title: item.name,
     icon: isHome ? h(item.meta?.icon ?? HomeOutlined) : undefined, // 仅在主页路径时显示 icon
+    children: item.children?.map((child: any) => menuToRouteItem(child))
   }
 }
 
@@ -72,11 +73,11 @@ const menuToRouteItem = (item: any) => {
 const items = computed(() => {
   return routes
     .filter((item) => {
-      if (item.meta?.hideInMenu) {
+      if (item?.meta?.hideInMenu) {
         return false
       }
       // 根据权限过滤菜单，有权限则返回 true，则保留该菜单
-      return checkAccess(loginUserStore.loginUser, item.meta?.access as string)
+      return checkAccess(loginUserStore.loginUser, item?.meta?.access as string)
     })
     .map(menuToRouteItem) // 转换为菜单项格式
 })
