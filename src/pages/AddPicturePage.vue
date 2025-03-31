@@ -1,9 +1,16 @@
 <template>
   <div id="addPicturePage">
     <h2 style="margin-bottom: 16px">
-      {{ route.query?.id ? '编辑图片' : '添加图片'}}
+      {{ route.query?.id ? '编辑图片' : '添加图片' }}
     </h2>
-    <PictureUpload :picture="picture" :on-success="onSuccess" />
+    <a-tabs v-model:activeKey="uploadType">
+      <a-tab-pane key="file" tab="文件上传">
+        <PictureUpload :picture="picture" :on-success="onSuccess" />
+      </a-tab-pane>
+      <a-tab-pane key="url" tab="URL上传">
+        <UrlPictureUpload :picture="picture" :on-success="onSuccess" />
+      </a-tab-pane>
+    </a-tabs>
     <a-form v-if="picture" layout="vertical" :model="pictureForm" @finish="handleSubmit">
       <a-form-item name="name" label="名称">
         <a-input v-model:value="pictureForm.name" placeholder="请输入图片名称" allow-clear />
@@ -16,19 +23,19 @@
           allow-clear
         />
       </a-form-item>
-      <a-form-item name="category" label="分类">
-        <a-auto-complete
-          v-model:value="pictureForm.category"
-          placeholder="请输入分类"
+      <a-form-item name="categoryId" label="分类">
+        <a-select
+          v-model:value="pictureForm.categoryId"
+          placeholder="至少选择一个分类"
           allow-clear
           :options="categoryOptions"
         />
       </a-form-item>
-      <a-form-item name="tags" label="标签">
+      <a-form-item name="tagIds" label="标签">
         <a-select
-          v-model:value="pictureForm.tags"
-          mode="tags"
-          placeholder="请输入标签"
+          v-model:value="pictureForm.tagIds"
+          mode="multiple"
+          placeholder="至少选择一个标签"
           allow-clear
           :options="tagOptions"
         />
@@ -44,22 +51,27 @@
 
 <script setup lang="ts">
 import PictureUpload from '@/components/PictureUpload.vue'
-import { onMounted, reactive, ref } from 'vue'
-import {
-  editPictureUsingPost,
-  getPictureVoByIdUsingGet,
-  listPictureTagCategoryUsingGet,
-} from '@/api/pictureController.ts'
+import { nextTick, onMounted, reactive, ref } from 'vue'
+import { editPictureUsingPost, getPictureVoByIdUsingGet } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
 import { useRoute, useRouter } from 'vue-router'
+import { listHotCategoriesUsingGet } from '@/api/categoryController.ts'
+import { listHotTagsUsingGet } from '@/api/tagController.ts'
+import UrlPictureUpload from '@/components/UrlPictureUpload.vue'
 
 const picture = ref<API.PictureVO>()
-const categoryOptions = ref<string[]>([])
-const tagOptions = ref<string[]>([])
-const pictureForm = reactive<API.PictureEditRequest>({})
+const categoryOptions = ref<any>([])
+const tagOptions = ref<any>([])
+const pictureForm = reactive<API.PictureEditRequest>({
+  name: '',
+  introduction: '',
+  categoryId: undefined,
+  tagIds: [],
+})
 
 const router = useRouter()
 const route = useRoute()
+const uploadType = ref<'file' | 'url'>('file');
 
 /**
  * 图片上传成功
@@ -101,45 +113,58 @@ const handleSubmit = async (values: API.PictureEditRequest) => {
  * @param values
  */
 const getTagCategoryOptions = async () => {
-  const res = await listPictureTagCategoryUsingGet()
-  // 操作成功
-  if (res.data.code === 0 && res.data.data) {
-    tagOptions.value = (res.data.data.tagList ?? []).map((item: string) => {
-      return {
-        value: item,
-        label: item,
-      }
-    })
-    categoryOptions.value = (res.data.data.categoryList ?? []).map((item: string) => {
-      return {
-        value: item,
-        label: item,
-      }
-    })
-  } else {
-    message.error('创建失败，' + res.data.message)
+  try {
+    const [tagRes, categoryRes] = await Promise.all([
+      listHotTagsUsingGet(),
+      listHotCategoriesUsingGet(),
+    ])
+
+    if (tagRes.data.code === 0 && tagRes.data.data) {
+      tagOptions.value = tagRes.data.data.map((tag) => ({
+        value: tag.id,
+        label: tag.tagName,
+        id: tag.id,
+      }))
+    }
+
+    if (categoryRes.data.code === 0 && categoryRes.data.data) {
+      categoryOptions.value = categoryRes.data.data.map((category) => ({
+        value: category.id,
+        label: category.categoryName,
+        id: category.id,
+      }))
+    }
+  } catch (error) {
+    message.error('获取分类/标签失败')
   }
 }
 
 // 获取旧的数据
 const getOldPicture = async () => {
   const id = route.query?.id
-  if(id) {
+  if (!id) return
+  try {
     const res = await getPictureVoByIdUsingGet({ id })
-    if(res.data.code === 0 && res.data.data) {
+    if (res.data.code === 0 && res.data.data) {
       const data = res.data.data
       picture.value = data
+      // 填充表单基础字段
+      // 确保选项数据已加载后再设置表单值
+      await nextTick()
       pictureForm.name = data.name
       pictureForm.introduction = data.introduction
-      pictureForm.category = data.category
-      pictureForm.tags = data.tags
+      pictureForm.categoryId = data.category?.id
+      pictureForm.tagIds = data.tagList?.map((tag) => tag.id)
+      console.log(data.category)
     }
+  } catch (error) {
+    message.error('获取图片详情失败')
   }
 }
 
-onMounted(() => {
-  getTagCategoryOptions()
-  getOldPicture()
+onMounted(async () => {
+  await getTagCategoryOptions()
+  await getOldPicture()
 })
 </script>
 

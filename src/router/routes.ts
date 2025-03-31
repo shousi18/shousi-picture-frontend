@@ -9,6 +9,7 @@ import { h } from 'vue'
 import AddPicturePage from '@/pages/AddPicturePage.vue'
 import PictureManagePage from '@/pages/admin/PictureManagePage.vue'
 import PictureDetailPage from '@/pages/PictureDetailPage.vue'
+import AddPictureBatchPage from '@/pages/AddPictureBatchPage.vue'
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -48,6 +49,9 @@ export const routes: Array<RouteRecordRaw> = [
         },
       },
     ],
+    meta: {
+      access: ACCESS_ENUM.ADMIN,
+    },
   },
   {
     path: '/user/register',
@@ -61,6 +65,14 @@ export const routes: Array<RouteRecordRaw> = [
     path: '/add_picture',
     name: '创建图片',
     component: AddPicturePage,
+  },
+  {
+    path: '/add_picture/batch',
+    name: '创建批量图片',
+    component: AddPictureBatchPage,
+    meta: {
+      access: ACCESS_ENUM.ADMIN,
+    }
   },
   {
     path: '/picture/:id',

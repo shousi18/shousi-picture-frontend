@@ -5,6 +5,24 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponseInt_ = {
+    code?: number
+    data?: number
+    message?: string
+  }
+
+  type BaseResponseListCategoryVO_ = {
+    code?: number
+    data?: CategoryVO[]
+    message?: string
+  }
+
+  type BaseResponseListTagVO_ = {
+    code?: number
+    data?: TagVO[]
+    message?: string
+  }
+
   type BaseResponseLoginUserVO_ = {
     code?: number
     data?: LoginUserVO
@@ -14,12 +32,6 @@ declare namespace API {
   type BaseResponseLong_ = {
     code?: number
     data?: number
-    message?: string
-  }
-
-  type BaseResponsePagePicture_ = {
-    code?: number
-    data?: PagePicture_
     message?: string
   }
 
@@ -71,6 +83,17 @@ declare namespace API {
     message?: string
   }
 
+  type CategoryAddRequest = {
+    categoryName?: string
+  }
+
+  type CategoryVO = {
+    categoryName?: string
+    createTime?: string
+    id?: number
+    totalNum?: number
+  }
+
   type DeleteRequest = {
     id?: number
   }
@@ -117,14 +140,6 @@ declare namespace API {
     vipNumber?: number
   }
 
-  type PagePicture_ = {
-    current?: number
-    pages?: number
-    records?: Picture[]
-    size?: number
-    total?: number
-  }
-
   type PagePictureVO_ = {
     current?: number
     pages?: number
@@ -142,7 +157,6 @@ declare namespace API {
   }
 
   type Picture = {
-    category?: string
     createTime?: string
     editTime?: string
     id?: number
@@ -154,22 +168,25 @@ declare namespace API {
     picScale?: number
     picSize?: number
     picWidth?: number
-    tags?: string
+    reviewMessage?: string
+    reviewStatus?: number
+    reviewTime?: string
+    reviewerId?: number
     updateTime?: string
     url?: string
     userId?: number
   }
 
   type PictureEditRequest = {
-    category?: string
+    categoryId?: number
     id?: number
     introduction?: string
     name?: string
-    tags?: string[]
+    tagIds?: number[]
   }
 
   type PictureQueryRequest = {
-    category?: string
+    categoryId?: number
     current?: number
     id?: number
     introduction?: string
@@ -180,11 +197,21 @@ declare namespace API {
     picScale?: number
     picSize?: number
     picWidth?: number
+    reviewMessage?: string
+    reviewStatus?: number
+    reviewTime?: string
+    reviewerId?: number
     searchText?: string
     sortField?: string
     sortOrder?: string
-    tags?: string[]
+    tagIds?: number[]
     userId?: number
+  }
+
+  type PictureReviewRequest = {
+    id?: number
+    reviewMessage?: string
+    reviewStatus?: number
   }
 
   type PictureTagCategory = {
@@ -200,10 +227,22 @@ declare namespace API {
     tags?: string[]
   }
 
+  type PictureUploadByBatchRequest = {
+    count?: number
+    first?: number
+    namePrefix?: string
+    searchText?: string
+  }
+
+  type PictureUploadRequest = {
+    fileUrl?: string
+    id?: number
+    picName?: string
+  }
+
   type PictureVO = {
-    category?: string
+    category?: CategoryVO
     createTime?: string
-    editTime?: string
     id?: number
     introduction?: string
     name?: string
@@ -212,11 +251,26 @@ declare namespace API {
     picScale?: number
     picSize?: number
     picWidth?: number
-    tags?: string[]
+    reviewMessage?: string
+    reviewStatus?: number
+    reviewTime?: string
+    reviewerId?: number
+    tagList?: TagVO[]
     updateTime?: string
     url?: string
     user?: UserVO
     userId?: number
+  }
+
+  type TagAddRequest = {
+    tagName?: string
+  }
+
+  type TagVO = {
+    createTime?: string
+    id?: number
+    tagName?: string
+    totalNum?: number
   }
 
   type testDownloadFileUsingGETParams = {
@@ -225,7 +279,9 @@ declare namespace API {
   }
 
   type uploadPictureUsingPOSTParams = {
+    fileUrl?: string
     id?: number
+    picName?: string
   }
 
   type User = {

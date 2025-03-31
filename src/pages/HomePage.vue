@@ -12,19 +12,19 @@
     </div>
     <!-- 分类和标签筛选 -->
     <a-tabs v-model:active-key="selectedCategory" @change="doSearch">
-      <a-tab-pane key="all" tab="全部" />
-      <a-tab-pane v-for="category in categoryList" :tab="category" :key="category" />
+      <a-tab-pane key="0" tab="全部" />
+      <a-tab-pane v-for="category in categoryList" :tab="category.categoryName" :key="category.id" />
     </a-tabs>
     <div class="tag-bar">
       <span style="margin-right: 8px">标签：</span>
       <a-space :size="[0, 8]" wrap>
         <a-checkable-tag
           v-for="(tag, index) in tagList"
-          :key="tag"
+          :key="tag.id"
           v-model:checked="selectedTagList[index]"
           @change="doSearch"
         >
-          {{ tag }}
+          {{ tag.tagName }}
         </a-checkable-tag>
       </a-space>
     </div>
@@ -50,10 +50,10 @@
               <template #description>
                 <a-flex>
                   <a-tag color="green">
-                    {{ picture.category ?? '默认' }}
+                    {{ picture.category.categoryName ?? '默认' }}
                   </a-tag>
-                  <a-tag v-for="tag in picture.tags" :key="tag">
-                    {{ tag }}
+                  <a-tag v-for="tag in picture.tagList" :key="tag">
+                    {{ tag.tagName }}
                   </a-tag>
                 </a-flex>
               </template>
@@ -72,7 +72,9 @@ import {
   listPictureVoByPageUsingPost,
 } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
-import { useRouter } from 'vue-router' // 定义数据
+import { useRouter } from 'vue-router'
+import { listHotTagsUsingGet } from '@/api/tagController.ts'
+import { listHotCategoriesUsingGet } from '@/api/categoryController.ts'
 
 // 定义数据
 const dataList = ref<API.PictureVO[]>([])
@@ -80,9 +82,9 @@ const total = ref(0)
 const loading = ref(true)
 
 // 标签和分类列表
-const categoryList = ref<string[]>([])
-const selectedCategory = ref<string>('all')
-const tagList = ref<string[]>([])
+const categoryList = ref<API.CategoryVO[]>([])
+const selectedCategory = ref<number | string>("0")
+const tagList = ref<API.TagVO[]>([])
 const selectedTagList = ref<boolean[]>([])
 
 // 搜索条件
@@ -99,16 +101,16 @@ const fetchData = async () => {
   // 转换搜索参数
   const params = {
     ...searchParams,
-    tags: [] as string[],
+    tagIds: [] as number[],
   }
-  if (selectedCategory.value !== 'all') {
-    params.category = selectedCategory.value
+  if (selectedCategory.value !== "0") {
+    params.categoryId = selectedCategory.value
   }
   // [true, false, false] => ['java']
   selectedTagList.value.forEach((useTag, index) => {
     // 元素为true，则添加到参数当中
     if (useTag) {
-      params.tags.push(tagList.value[index])
+      params.tagIds.push(tagList.value[index].id)
     }
   })
   const res = await listPictureVoByPageUsingPost(params)
@@ -152,12 +154,19 @@ const doSearch = () => {
  * @param values
  */
 const getTagCategoryOptions = async () => {
-  const res = await listPictureTagCategoryUsingGet()
-  if (res.data.code === 0 && res.data.data) {
-    tagList.value = res.data.data.tagList ?? []
-    categoryList.value = res.data.data.categoryList ?? []
-  } else {
-    message.error('获取标签分类列表失败，' + res.data.message)
+  try {
+    const [tagRes, categoryRes] = await Promise.all([
+      listHotTagsUsingGet(),
+      listHotCategoriesUsingGet(),
+    ])
+    if (tagRes.data.code === 0 && tagRes.data.data) {
+      tagList.value = tagRes.data.data
+    }
+    if (categoryRes.data.code === 0 && categoryRes.data.data) {
+      categoryList.value = categoryRes.data.data
+    }
+  } catch (error) {
+    message.error('获取分类/标签失败')
   }
 }
 
