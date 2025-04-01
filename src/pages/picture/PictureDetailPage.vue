@@ -51,8 +51,13 @@
             <a-button :icon="h(EditOutlined)" v-if="canEdit" type="default" @click="doEdit">
               编辑
             </a-button>
-            <a-popconfirm title="你确认删除该图片吗？" ok-text="确认" cancel-text="取消" @confirm="doDelete">
-              <a-button :icon="h(DeleteOutlined)" v-if="canEdit" danger> 删除 </a-button>
+            <a-popconfirm
+              title="你确认删除该图片吗？"
+              ok-text="确认"
+              cancel-text="取消"
+              @confirm="doDelete"
+            >
+              <a-button :icon="h(DeleteOutlined)" v-if="canEdit" danger> 删除</a-button>
             </a-popconfirm>
             <a-button type="default" @click="doDownload">
               免费下载
@@ -121,7 +126,7 @@ import {
 } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
-import { downloadImage, formatFileSize } from '../utils'
+import { downloadImage, formatFileSize } from '../../utils'
 import { useRouter } from 'vue-router' // 定义数据
 import { DownloadOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons-vue'
 import { PIC_REVIEW_STATUS_ENUM } from '@/constant/picture.ts'
@@ -180,7 +185,10 @@ const doDownload = () => {
 const doEdit = () => {
   router.push({
     path: '/add_picture',
-    query: { id: picture.value?.id },
+    query: {
+      id: picture.value?.id,
+      spaceId: picture.value?.spaceId,
+    },
   })
 }
 

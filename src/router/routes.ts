@@ -6,10 +6,14 @@ import UserRegisterPage from '@/pages/user/UserRegisterPage.vue'
 import UserManagePage from '@/pages/admin/UserManagePage.vue'
 import ACCESS_ENUM from '@/access/accessEnum.ts'
 import { h } from 'vue'
-import AddPicturePage from '@/pages/AddPicturePage.vue'
+import AddPicturePage from '@/pages/picture/AddPicturePage.vue'
 import PictureManagePage from '@/pages/admin/PictureManagePage.vue'
-import PictureDetailPage from '@/pages/PictureDetailPage.vue'
-import AddPictureBatchPage from '@/pages/AddPictureBatchPage.vue'
+import PictureDetailPage from '@/pages/picture/PictureDetailPage.vue'
+import AddPictureBatchPage from '@/pages/picture/AddPictureBatchPage.vue'
+import SpaceManagePage from '@/pages/admin/SpaceManagePage.vue'
+import AddSpacePage from '@/pages/space/AddSpacePage.vue'
+import MySpacePage from '@/pages/space/MySpacePage.vue'
+import SpaceDetailPage from '@/pages/space/SpaceDetailPage.vue'
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -48,6 +52,14 @@ export const routes: Array<RouteRecordRaw> = [
           access: ACCESS_ENUM.ADMIN,
         },
       },
+      {
+        path: '/admin/spaceManage',
+        name: '空间管理',
+        component: SpaceManagePage,
+        meta: {
+          access: ACCESS_ENUM.ADMIN,
+        },
+      },
     ],
     meta: {
       access: ACCESS_ENUM.ADMIN,
@@ -72,6 +84,28 @@ export const routes: Array<RouteRecordRaw> = [
     component: AddPictureBatchPage,
     meta: {
       access: ACCESS_ENUM.ADMIN,
+    },
+  },
+  {
+    path: '/add_space',
+    name: '创建空间',
+    component: AddSpacePage,
+  },
+  {
+    path: '/my_space',
+    name: '空间跳转',
+    component: MySpacePage,
+    meta: {
+      hideInMenu: true,
+    },
+  },
+  {
+    path: '/space/:id',
+    name: '我的空间',
+    component: SpaceDetailPage,
+    props: true,
+    meta: {
+      hideInMenu: true,
     }
   },
   {

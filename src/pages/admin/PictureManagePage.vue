@@ -50,7 +50,7 @@
     >
       <template #bodyCell="{ column, record }">
         <template v-if="column.dataIndex === 'url'">
-          <a-image :src="record.url" :width="120" />
+          <a-image :src="record.url" :width="90" />
         </template>
         <!-- 标签 -->
         <template v-if="column.dataIndex === 'category'">

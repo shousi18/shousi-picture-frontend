@@ -33,6 +33,7 @@ import { uploadPictureByUrlUsingPost, uploadPictureUsingPost } from '@/api/pictu
 import { CloudUploadOutlined } from '@ant-design/icons-vue'
 interface Props {
   picture?: API.PictureVO
+  spaceId?: number
   onSuccess?: (newPicture: API.PictureVO) => void
 }
 
@@ -58,6 +59,7 @@ const handleUpload = async ({ file }: any) => {
       // 如果是更新则传入id
       params.id = props.picture.id
     }
+    params.spaceId = props.spaceId
     const res = await uploadPictureByUrlUsingPost(params)
     if (res.data.code === 0 && res.data.data) {
       message.success('图片上传成功')
