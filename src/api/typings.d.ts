@@ -71,12 +71,6 @@ declare namespace API {
     message?: string
   }
 
-  type BaseResponsePictureTagCategory_ = {
-    code?: number
-    data?: PictureTagCategory
-    message?: string
-  }
-
   type BaseResponsePictureVO_ = {
     code?: number
     data?: PictureVO
@@ -250,6 +244,7 @@ declare namespace API {
   type PictureQueryRequest = {
     categoryId?: number
     current?: number
+    endEditTime?: string
     id?: number
     introduction?: string
     name?: string
@@ -268,6 +263,7 @@ declare namespace API {
     sortField?: string
     sortOrder?: string
     spaceId?: number
+    startEditTime?: string
     tagIds?: number[]
     userId?: number
   }
@@ -276,11 +272,6 @@ declare namespace API {
     id?: number
     reviewMessage?: string
     reviewStatus?: number
-  }
-
-  type PictureTagCategory = {
-    categoryList?: string[]
-    tagList?: string[]
   }
 
   type PictureUpdateRequest = {

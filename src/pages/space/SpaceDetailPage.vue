@@ -4,7 +4,7 @@
     <a-flex justify="space-between">
       <h2>{{ space?.spaceName }}（私有空间）</h2>
       <a-space size="middle">
-        <a-button type="primary" :href="`/add_picture?spaceId=${id}`"> + 创建图片 </a-button>
+        <a-button type="primary" :href="`/add_picture?spaceId=${id}`"> + 创建图片</a-button>
         <a-tooltip
           :title="`占用空间 ${formatFileSize(space?.totalSize)} / ${formatFileSize(space?.maxSize)}`"
         >
@@ -16,6 +16,7 @@
         </a-tooltip>
       </a-space>
     </a-flex>
+    <PictureSearchForm :on-search="onSearch" />
     <!-- 图片列表 -->
     <PictureList
       :dataList="dataList"
@@ -43,13 +44,14 @@ import { formatFileSize } from '../../utils'
 import { getSpaceVoByIdUsingGet } from '@/api/spaceController.ts'
 import PictureList from '@/components/PictureList.vue'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
+import PictureSearchForm from '@/components/PictureSearchForm.vue'
 
 interface Props {
   id: number | string
 }
 
 // 搜索条件
-const searchParams = reactive<API.PictureQueryRequest>({
+const searchParams = ref<API.PictureQueryRequest>({
   current: 1,
   pageSize: 12,
   sortField: 'createTime',
@@ -57,7 +59,7 @@ const searchParams = reactive<API.PictureQueryRequest>({
 })
 
 const props = defineProps<Props>()
-const loginUserStore = useLoginUserStore();
+const loginUserStore = useLoginUserStore()
 
 const space = ref<API.SpaceVO>()
 
@@ -69,16 +71,18 @@ const loading = ref(true)
  * 获取图片详细
  */
 const fetchSpaceDetail = async () => {
-  if (loginUserStore.loginUser !== space.value?.userId) {
-    message.error('您无权限访问别人的空间')
-    return
-  }
   const res = await getSpaceVoByIdUsingGet({ id: props.id })
   if (res.data.code === 0 && res.data.data) {
     space.value = res.data.data
     message.success('获取空间详细成功')
   } else {
     message.error('获取空间详细失败，' + res.data.message)
+  }
+  if (loginUserStore.loginUser.id !== space.value?.userId) {
+    console.log(loginUserStore.loginUser.id)
+    console.log(space.value?.userId)
+    message.error('您无权限访问别人的空间')
+    return
   }
 }
 
@@ -88,7 +92,7 @@ const fetchData = async () => {
   // 转换搜索参数
   const params = {
     spaceId: props.id,
-    ...searchParams,
+    ...searchParams.value,
   }
   const res = await listPictureVoByPageUsingPost(params)
   if (res.data.code === 0 && res.data.data) {
@@ -101,13 +105,22 @@ const fetchData = async () => {
 }
 
 onMounted(() => {
-  fetchSpaceDetail()
   fetchData()
+  fetchSpaceDetail()
 })
 
 const onPageChange = (page, pageSize) => {
-  searchParams.current = page
-  searchParams.pageSize = pageSize
+  searchParams.value.current = page
+  searchParams.value.pageSize = pageSize
+  fetchData()
+}
+
+const onSearch = (newSearchParams: API.PictureQueryRequest) => {
+  searchParams.value = {
+    ...searchParams.value,
+    ...newSearchParams,
+    current: 1,
+  }
   fetchData()
 }
 </script>

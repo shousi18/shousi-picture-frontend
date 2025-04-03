@@ -122,14 +122,6 @@ export async function pictureReviewUsingPost(
   })
 }
 
-/** listPictureTagCategory GET /api/picture/tag_category */
-export async function listPictureTagCategoryUsingGet(options?: { [key: string]: any }) {
-  return request<API.BaseResponsePictureTagCategory_>('/api/picture/tag_category', {
-    method: 'GET',
-    ...(options || {}),
-  })
-}
-
 /** updatePicture POST /api/picture/update */
 export async function updatePictureUsingPost(
   body: API.PictureUpdateRequest,
