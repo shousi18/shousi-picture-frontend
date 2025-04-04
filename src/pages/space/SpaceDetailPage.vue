@@ -5,6 +5,7 @@
       <h2>{{ space?.spaceName }}（私有空间）</h2>
       <a-space size="middle">
         <a-button type="primary" :href="`/add_picture?spaceId=${id}`"> + 创建图片</a-button>
+        <a-button type="primary" :icon="h(EditOutlined)" @click="doBatchEdit"> 批量编辑</a-button>
         <a-tooltip
           :title="`占用空间 ${formatFileSize(space?.totalSize)} / ${formatFileSize(space?.maxSize)}`"
         >
@@ -17,6 +18,10 @@
       </a-space>
     </a-flex>
     <PictureSearchForm :on-search="onSearch" />
+    <!-- 按颜色搜索 -->
+    <a-form-item label="按颜色搜索" style="margin-top: 16px">
+      <color-picker format="hex" @pureColorChange="onColorChange" />
+    </a-form-item>
     <!-- 图片列表 -->
     <PictureList
       :dataList="dataList"
@@ -33,18 +38,28 @@
       :show-total="() => `图片总数 ${total} / ${space?.maxCount}`"
       @change="onPageChange"
     />
+    <BatchEditPictureModal
+      ref="batchEditPictureModalRef"
+      :spaceId="id as number"
+      :pictureList="dataList"
+      :onSuccess="onBatchEditPictureSuccess"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
-import { listPictureVoByPageUsingPost } from '@/api/pictureController.ts'
+import { h, onMounted, reactive, ref } from 'vue'
+import { listPictureVoByPageUsingPost, searchPictureByColorUsingPost } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
 import { formatFileSize } from '../../utils'
 import { getSpaceVoByIdUsingGet } from '@/api/spaceController.ts'
 import PictureList from '@/components/PictureList.vue'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
 import PictureSearchForm from '@/components/PictureSearchForm.vue'
+import { ColorPicker } from 'vue3-colorpicker'
+import 'vue3-colorpicker/style.css'
+import BatchEditPictureModal from '@/components/BatchEditPictureModal.vue'
+import { EditOutlined } from '@ant-design/icons-vue'
 
 interface Props {
   id: number | string
@@ -57,6 +72,26 @@ const searchParams = ref<API.PictureQueryRequest>({
   sortField: 'createTime',
   sortOrder: 'descend',
 })
+// 弹窗组件实例
+const batchEditPictureModalRef = ref()
+
+/**
+ * 按照图片主色调搜索
+ * @param color
+ */
+const onColorChange = async (color: string) => {
+  const res = await searchPictureByColorUsingPost({
+    picColor: color,
+    spaceId: props.id,
+  })
+  if (res.data.code === 0 && res.data.data) {
+    const data = res.data.data ?? [];
+    dataList.value = data;
+    total.value = data.length;
+  } else {
+    message.error('获取数据失败，' + res.data.message)
+  }
+}
 
 const props = defineProps<Props>()
 const loginUserStore = useLoginUserStore()
@@ -86,7 +121,9 @@ const fetchSpaceDetail = async () => {
   }
 }
 
-// 获取数据
+/**
+ * 获取数据
+ */
 const fetchData = async () => {
   loading.value = true
   // 转换搜索参数
@@ -104,10 +141,26 @@ const fetchData = async () => {
   loading.value = false
 }
 
+/**
+ * 批量编辑成功后，刷新数据
+ */
+const onBatchEditPictureSuccess = () => {
+  fetchData()
+}
+
 onMounted(() => {
   fetchData()
   fetchSpaceDetail()
 })
+
+/**
+ * 打开批量编辑弹窗
+ */
+const doBatchEdit = () => {
+  if (batchEditPictureModalRef.value) {
+    batchEditPictureModalRef.value.openModal()
+  }
+}
 
 const onPageChange = (page, pageSize) => {
   searchParams.value.current = page

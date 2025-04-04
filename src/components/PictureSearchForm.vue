@@ -85,7 +85,7 @@ const searchParams = reactive<API.PictureQueryRequest>({})
 const tagOptions = ref<API.TagVO[]>([])
 const categoryOptions = ref<API.CategoryVO[]>([])
 
-const activeKey = ref<string[]>(['1']);
+const activeKey = ref<string[]>(['']);
 
 const rangePresets = ref([
   {

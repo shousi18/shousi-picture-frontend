@@ -46,6 +46,19 @@
             <a-descriptions-item label="大小">
               {{ formatFileSize(picture?.picSize) }}
             </a-descriptions-item>
+            <a-descriptions-item label="主色调">
+              <a-space>
+                {{ picture?.picColor ?? '-' }}
+                <div
+                  v-if="picture?.picColor"
+                  :style="{
+                    backgroundColor: toHexColor(picture?.picColor),
+                    width: '16px',
+                    height: '16px',
+                  }"
+                />
+              </a-space>
+            </a-descriptions-item>
           </a-descriptions>
           <a-space wrap>
             <a-button :icon="h(EditOutlined)" v-if="canEdit" type="default" @click="doEdit">
@@ -63,6 +76,12 @@
               免费下载
               <template #icon>
                 <DownloadOutlined />
+              </template>
+            </a-button>
+            <a-button type="primary" ghost @click="doShare">
+              分享
+              <template #icon>
+                <share-alt-outlined />
               </template>
             </a-button>
             <a-popconfirm
@@ -114,6 +133,7 @@
         :maxlength="50"
       />
     </a-modal>
+    <ShareModal ref="shareModalRef" :link="shareLink" />
   </div>
 </template>
 
@@ -126,11 +146,17 @@ import {
 } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
-import { downloadImage, formatFileSize } from '../../utils'
+import { downloadImage, formatFileSize, toHexColor } from '../../utils'
 import { useRouter } from 'vue-router' // 定义数据
-import { DownloadOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons-vue'
+import {
+  DownloadOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  ShareAltOutlined,
+} from '@ant-design/icons-vue'
 import { PIC_REVIEW_STATUS_ENUM } from '@/constant/picture.ts'
 import ACCESS_ENUM from '@/access/accessEnum.ts'
+import ShareModal from '@/components/ShareModal.vue'
 
 interface Props {
   id: number | string
@@ -145,6 +171,9 @@ const showModal = ref<boolean>(false)
 const rejectReason = ref<any>()
 
 const loginUserStore = useLoginUserStore()
+
+const shareLink = ref<string>()
+const shareModalRef = ref()
 
 const canEdit = computed(() => {
   const loginUser = loginUserStore.loginUser
@@ -169,6 +198,18 @@ const fetchPictureDetail = async () => {
 onMounted(() => {
   fetchPictureDetail()
 })
+
+/**
+ * 分享按钮
+ * @param picture
+ * @param e
+ */
+const doShare = () => {
+  shareLink.value = `${window.location.protocol}//${window.location.host}/picture/${picture.value?.id}`
+  if (shareModalRef.value) {
+    shareModalRef.value.openModal()
+  }
+}
 
 /**
  * 下载按钮

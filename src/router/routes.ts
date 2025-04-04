@@ -14,6 +14,8 @@ import SpaceManagePage from '@/pages/admin/SpaceManagePage.vue'
 import AddSpacePage from '@/pages/space/AddSpacePage.vue'
 import MySpacePage from '@/pages/space/MySpacePage.vue'
 import SpaceDetailPage from '@/pages/space/SpaceDetailPage.vue'
+import SearchPicturePage from '@/pages/picture/SearchPicturePage.vue'
+import SearchPictureBySoPage from '@/pages/picture/SearchPictureBySoPage.vue'
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -117,4 +119,20 @@ export const routes: Array<RouteRecordRaw> = [
       hideInMenu: true,
     },
   },
+  {
+    path: '/search_picture',
+    name: '图片搜索',
+    component: SearchPicturePage,
+    meta: {
+      hideInMenu: true,
+    },
+  },
+  {
+    path: '/search_picture_so',
+    name: '图片搜索(360)',
+    component: SearchPictureBySoPage,
+    meta: {
+      hideInMenu: true,
+    },
+  }
 ]
