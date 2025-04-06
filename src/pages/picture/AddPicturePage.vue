@@ -14,6 +14,29 @@
         <UrlPictureUpload :picture="picture" :spaceId="spaceId" :on-success="onSuccess" />
       </a-tab-pane>
     </a-tabs>
+    <!--  图片编辑区域  -->
+    <div v-if="picture" class="edit-bar">
+      <a-space>
+        <a-button :icon="h(EditOutlined)" @click="doEditPicture">编辑图片</a-button>
+        <a-button type="primary" :icon="h(FullscreenOutlined)" @click="doImagePainting">
+          AI 扩图
+        </a-button>
+      </a-space>
+      <ImageCropper
+        ref="imageCropperRef"
+        :imageUrl="picture?.url"
+        :picture="picture"
+        :spaceId="spaceId"
+        :onSuccess="onCropSuccess"
+      />
+      <ImageOutPainting
+        ref="imageOutPaintingRef"
+        :picture="picture"
+        :spaceId="spaceId"
+        :onSuccess="onImageOutPaintingSucess"
+      />
+    </div>
+    <!--  表单组件  -->
     <a-form v-if="picture" layout="vertical" :model="pictureForm" @finish="handleSubmit">
       <a-form-item name="name" label="名称">
         <a-input v-model:value="pictureForm.name" placeholder="请输入图片名称" allow-clear />
@@ -54,13 +77,16 @@
 
 <script setup lang="ts">
 import PictureUpload from '@/components/PictureUpload.vue'
-import { computed, nextTick, onMounted, reactive, ref } from 'vue'
+import { computed, h, nextTick, onMounted, reactive, ref } from 'vue'
 import { editPictureUsingPost, getPictureVoByIdUsingGet } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
 import { useRoute, useRouter } from 'vue-router'
 import { listHotCategoriesUsingGet } from '@/api/categoryController.ts'
 import { listHotTagsUsingGet } from '@/api/tagController.ts'
 import UrlPictureUpload from '@/components/UrlPictureUpload.vue'
+import { EditOutlined, FullscreenOutlined } from '@ant-design/icons-vue'
+import ImageCropper from '@/components/ImageCropper.vue'
+import ImageOutPainting from '@/components/ImageOutPainting.vue'
 
 const picture = ref<API.PictureVO>()
 const categoryOptions = ref<any>([])
@@ -74,11 +100,52 @@ const pictureForm = reactive<API.PictureEditRequest>({
 
 const router = useRouter()
 const route = useRoute()
-const uploadType = ref<'file' | 'url'>('file');
+const uploadType = ref<'file' | 'url'>('file')
 
 const spaceId = computed(() => {
   return route.query?.spaceId
 })
+
+// AI 扩图弹窗容器引用
+const imageOutPaintingRef = ref()
+
+/**
+ * 打开AI扩图弹窗
+ */
+const doImagePainting = () => {
+  if (imageOutPaintingRef.value) {
+    imageOutPaintingRef.value.openModal()
+  }
+}
+
+/**
+ * 扩图成功事件
+ * @param newPicture
+ */
+const onImageOutPaintingSucess = (newPicture: API.PictureVO) => {
+  picture.value = newPicture
+}
+
+
+// 图片编辑弹窗容器引用
+const imageCropperRef = ref()
+
+/**
+ * 打开编辑图片弹窗
+ */
+const doEditPicture = () => {
+  if (imageCropperRef.value) {
+    imageCropperRef.value.openModal()
+  }
+}
+
+/**
+ * 编辑成功事件
+ * @param newPicture
+ */
+const onCropSuccess = (newPicture: API.PictureVO) => {
+  picture.value = newPicture
+}
 
 /**
  * 图片上传成功
@@ -147,7 +214,9 @@ const getTagCategoryOptions = async () => {
   }
 }
 
-// 获取旧的数据
+/**
+ * 获取旧的数据
+ */
 const getOldPicture = async () => {
   const id = route.query?.id
   if (!id) return
@@ -180,5 +249,10 @@ onMounted(async () => {
 #addPicturePage {
   width: 720px;
   margin: 0 auto;
+}
+
+#addPicturePage .edit-bar {
+  text-align: center;
+  margin: 16px 0;
 }
 </style>
