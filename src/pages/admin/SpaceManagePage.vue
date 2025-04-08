@@ -3,7 +3,13 @@
     <a-flex justify="space-between">
       <h2>空间管理</h2>
       <a-space>
-        <a-button type="primary" href="/add_picture">+ 创建图片</a-button>
+        <a-button type="primary" href="/add_space" target="_blank">+ 创建空间</a-button>
+        <a-button type="primary" ghost href="/space_analyze?queryPublic=1" target="_blank">
+          分析公共图库
+        </a-button>
+        <a-button type="primary" ghost href="/space_analyze?queryAll=1" target="_blank">
+          分析全空间
+        </a-button>
       </a-space>
     </a-flex>
     <a-form layout="inline" :model="searchParams" @finish="doSearch">
@@ -41,7 +47,9 @@
         </template>
         <!-- 使用情况 -->
         <template v-if="column.dataIndex === 'spaceUseInfo'">
-          <div>大小：{{ formatFileSize(record.totalSize) }} / {{ formatFileSize(record.maxSize) }}</div>
+          <div>
+            大小：{{ formatFileSize(record.totalSize) }} / {{ formatFileSize(record.maxSize) }}
+          </div>
           <div>数量：{{ record.totalCount }} / {{ record.maxCount }}</div>
         </template>
         <template v-else-if="column.dataIndex === 'createTime'">
@@ -63,6 +71,9 @@
             >
               <a-button type="link" danger>删除</a-button>
             </a-popconfirm>
+            <a-button type="link" :href="`/space_analyze?spaceId=${record.id}`" target="_blank">
+              分析
+            </a-button>
           </a-space>
         </template>
       </template>

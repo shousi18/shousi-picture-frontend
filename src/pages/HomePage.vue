@@ -50,7 +50,7 @@ import { listPictureVoByPageUsingPost } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
 import { listHotTagsUsingGet } from '@/api/tagController.ts'
 import { listHotCategoriesUsingGet } from '@/api/categoryController.ts'
-import PictureList from '@/components/PictureList.vue'
+import PictureList from '@/components/picture/PictureList.vue'
 
 const dataList = ref<API.PictureVO[]>([])
 const total = ref(0)

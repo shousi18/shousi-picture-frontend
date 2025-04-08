@@ -16,6 +16,7 @@ import MySpacePage from '@/pages/space/MySpacePage.vue'
 import SpaceDetailPage from '@/pages/space/SpaceDetailPage.vue'
 import SearchPicturePage from '@/pages/picture/SearchPicturePage.vue'
 import SearchPictureBySoPage from '@/pages/picture/SearchPictureBySoPage.vue'
+import SpaceAnalyzePage from '@/pages/analyze/SpaceAnalyzePage.vue'
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -108,7 +109,7 @@ export const routes: Array<RouteRecordRaw> = [
     props: true,
     meta: {
       hideInMenu: true,
-    }
+    },
   },
   {
     path: '/picture/:id',
@@ -134,5 +135,10 @@ export const routes: Array<RouteRecordRaw> = [
     meta: {
       hideInMenu: true,
     },
-  }
+  },
+  {
+    path: '/space_analyze',
+    name: '空间分析',
+    component: SpaceAnalyzePage,
+  },
 ]

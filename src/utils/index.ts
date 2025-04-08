@@ -22,7 +22,7 @@ export const downloadImage = (url: string, fileName: string) => {
  * 转换为16进制颜色
  * @param input
  */
-export function toHexColor(input) {
+export function toHexColor(input: string) {
   // 去掉 0x 前缀
   const colorValue = input.startsWith('0x') ? input.slice(2) : input
 

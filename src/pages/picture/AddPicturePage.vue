@@ -76,17 +76,17 @@
 </template>
 
 <script setup lang="ts">
-import PictureUpload from '@/components/PictureUpload.vue'
+import PictureUpload from '@/components/picture/upload/PictureUpload.vue'
 import { computed, h, nextTick, onMounted, reactive, ref } from 'vue'
 import { editPictureUsingPost, getPictureVoByIdUsingGet } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
 import { useRoute, useRouter } from 'vue-router'
 import { listHotCategoriesUsingGet } from '@/api/categoryController.ts'
 import { listHotTagsUsingGet } from '@/api/tagController.ts'
-import UrlPictureUpload from '@/components/UrlPictureUpload.vue'
+import UrlPictureUpload from '@/components/picture/upload/UrlPictureUpload.vue'
 import { EditOutlined, FullscreenOutlined } from '@ant-design/icons-vue'
-import ImageCropper from '@/components/ImageCropper.vue'
-import ImageOutPainting from '@/components/ImageOutPainting.vue'
+import ImageCropper from '@/components/picture/edit/ImageCropper.vue'
+import ImageOutPainting from '@/components/picture/ImageOutPainting.vue'
 
 const picture = ref<API.PictureVO>()
 const categoryOptions = ref<any>([])

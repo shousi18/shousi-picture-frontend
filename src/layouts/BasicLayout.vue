@@ -23,8 +23,8 @@
 </template>
 
 <script setup lang="ts">
-import GlobalHeader from '@/components/GlobalHeader.vue'
-import GlobalSider from '@/components/GlobalSider.vue'
+import GlobalHeader from '@/components/layout/GlobalHeader.vue'
+import GlobalSider from '@/components/layout/GlobalSider.vue'
 </script>
 
 <style scoped>
