@@ -199,6 +199,21 @@ export async function updateUserAvatarUsingPost(
   })
 }
 
+/** updateUserEmail POST /api/user/update/email */
+export async function updateUserEmailUsingPost(
+  body: API.UserUpdateEmailRequest,
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponseBoolean_>('/api/user/update/email', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  })
+}
+
 /** updateUserPassword POST /api/user/update/password */
 export async function updateUserPasswordUsingPost(
   body: API.UserUpdatePasswordRequest,

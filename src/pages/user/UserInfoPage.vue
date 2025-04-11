@@ -48,7 +48,7 @@
               </template>
               修改密码
             </a-button>
-            <a-button block class="action-btn">
+            <a-button block class="action-btn" @click="openEditEmailModal">
               <template #icon>
                 <MailOutlined />
               </template>
@@ -72,14 +72,13 @@
     </a-row>
 
     <!-- 编辑资料模态框组件 -->
-    <EditUserInfoModal
-      ref="editUserInfo"
-      :user-info="userInfo"
-      :onSuccess="handleAvatarSuccess"
-    />
+    <EditUserInfoModal ref="editUserInfo" :user-info="userInfo" :onSuccess="handleAvatarSuccess" />
 
     <!-- 修改密码模态框组件 -->
     <EditPasswordModal ref="editPassword" :user-info="userInfo" />
+
+    <!-- 修改邮箱模态框组件 -->
+    <EditEmailModal ref="editEmail" :user-info="userInfo" :onSuccess="handleEmailSuccess" />
   </div>
 </template>
 
@@ -94,11 +93,12 @@ import {
 import { message, Modal } from 'ant-design-vue'
 import { onMounted, ref } from 'vue'
 import dayjs from 'dayjs'
-import { getUserVoByIdUsingGet, updateUserUsingPost } from '@/api/userController.ts'
+import { getUserVoByIdUsingGet } from '@/api/userController.ts'
 import { useRouter } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
-import EditPasswordModal from '@/components/user/EditPasswordModal.vue'
-import EditUserInfoModal from '@/components/user/EditUserInfoModal.vue'
+import EditPasswordModal from '@/components/userinfo/EditPasswordModal.vue'
+import EditUserInfoModal from '@/components/userinfo/EditUserInfoModal.vue'
+import EditEmailModal from '@/components/userinfo/EditEmailModal.vue'
 
 // 原有逻辑保持不变，新增以下内容
 const loading = ref(false)
@@ -148,6 +148,16 @@ const openEditPasswordModal = () => {
     editPassword.value.openModal()
   }
 }
+// ----- 修改用户邮箱模态框
+const editEmail = ref()
+const openEditEmailModal = () => {
+  if (editEmail.value) {
+    editEmail.value.openModal()
+  }
+}
+const handleEmailSuccess = (newUserInfo: API.UserVO) => {
+  userInfo.value = newUserInfo
+}
 
 const showAboutModal = () => {
   Modal.info({
@@ -194,6 +204,7 @@ const handleLogout = () => {
   }
 
   .action-card {
+    min-height: 422px;
     border-radius: 8px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
 

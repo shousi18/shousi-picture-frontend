@@ -53,7 +53,7 @@
 import { ref } from 'vue'
 import { message } from 'ant-design-vue'
 import { PlusOutlined } from '@ant-design/icons-vue'
-import AvatarCropper from '@/components/user/AvatarCropper.vue'
+import AvatarCropper from '@/components/userinfo/AvatarCropper.vue'
 import { updateUserAvatarUsingPost, updateUserUsingPost } from '@/api/userController.ts'
 
 interface Props {
