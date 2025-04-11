@@ -1,6 +1,14 @@
 <template>
-  <div id="globalSider">
-    <a-layout-sider class="sider" width="200" v-if="loginUserStore.loginUser.id" breakpoint="lg">
+  <div id="globalSider" @mouseenter="handMouseEnter" @mouseleave="handleMouseLeave">
+    <a-layout-sider
+      :collapsed="!expanded"
+      collapsible
+      class="custom-sider"
+      :width="expanded ? 200 : 80"
+      v-if="loginUserStore.loginUser.id"
+      :trigger="null"
+      breakpoint="lg"
+    >
       <a-menu
         mode="inline"
         v-model:selectedKeys="current"
@@ -14,7 +22,12 @@
 import { computed, h, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
-import { PictureOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons-vue'
+import {
+  PictureOutlined,
+  TeamOutlined,
+  UserOutlined,
+  UsergroupAddOutlined,
+} from '@ant-design/icons-vue'
 import { SPACE_TYPE_ENUM } from '@/constant/space.ts'
 import { listMyTeamSpaceUsingPost } from '@/api/spaceUserController.ts'
 import { message } from 'ant-design-vue'
@@ -39,7 +52,7 @@ const fixedMenuItems = [
   {
     key: '/add_space?type=' + SPACE_TYPE_ENUM.TEAM,
     label: '创建团队',
-    icon: () => h(TeamOutlined),
+    icon: () => h(UsergroupAddOutlined),
   },
 ]
 const teamSpaceList = ref<API.SpaceUserVO[]>([])
@@ -57,7 +70,7 @@ const menuItems = computed(() => {
     }
   })
   const teamSpaceMenuGroup = {
-    type: 'group',
+    icon: () => h(TeamOutlined),
     label: '我的团队空间',
     key: 'teamSpace',
     children: teamSpaceSubMenus,
@@ -73,8 +86,22 @@ const fetchTeamSpaceList = async () => {
   if (res.data.code === 0 && res.data.data) {
     teamSpaceList.value = res.data.data
   } else {
-    message.error("加载我的团队空间失败，" + res.data.message)
+    message.error('加载我的团队空间失败，' + res.data.message)
   }
+}
+
+const expanded = ref<boolean>(false)
+/**
+ * 鼠标移出
+ */
+const handleMouseLeave = () => {
+  expanded.value = false
+}
+/**
+ * 鼠标移入
+ */
+const handMouseEnter = () => {
+  expanded.value = true
 }
 
 /**
@@ -109,5 +136,12 @@ router.afterEach((to, from, next) => {
 
 #globalSider :deep(.ant-layout-sider) {
   background: none !important;
+}
+
+.custom-sider {
+  background: white;
+  transition: all 0.3s cubic-bezier(0.2, 0, 0, 1) 0s;
+  overflow: hidden;
+  height: 100%;
 }
 </style>

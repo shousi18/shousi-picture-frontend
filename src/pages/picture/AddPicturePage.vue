@@ -33,7 +33,7 @@
         ref="imageOutPaintingRef"
         :picture="picture"
         :spaceId="spaceId"
-        :onSuccess="onImageOutPaintingSucess"
+        :onSuccess="onImageOutPaintingSuccess"
       />
     </div>
     <!--  表单组件  -->
@@ -122,7 +122,7 @@ const doImagePainting = () => {
  * 扩图成功事件
  * @param newPicture
  */
-const onImageOutPaintingSucess = (newPicture: API.PictureVO) => {
+const onImageOutPaintingSuccess = (newPicture: API.PictureVO) => {
   picture.value = newPicture
 }
 

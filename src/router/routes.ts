@@ -18,6 +18,7 @@ import SearchPicturePage from '@/pages/picture/SearchPicturePage.vue'
 import SearchPictureBySoPage from '@/pages/picture/SearchPictureBySoPage.vue'
 import SpaceAnalyzePage from '@/pages/analyze/SpaceAnalyzePage.vue'
 import SpaceUserManagePage from '@/pages/admin/SpaceUserManagePage.vue'
+import UserInfoPage from '@/pages/user/UserInfoPage.vue'
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -78,6 +79,14 @@ export const routes: Array<RouteRecordRaw> = [
     },
   },
   {
+    path: '/user/info',
+    name: '用户信息',
+    component: UserInfoPage,
+    meta: {
+      hideInMenu: true,
+    }
+  },
+  {
     path: '/add_picture',
     name: '创建图片',
     component: AddPicturePage,
@@ -94,6 +103,9 @@ export const routes: Array<RouteRecordRaw> = [
     path: '/add_space',
     name: '创建空间',
     component: AddSpacePage,
+    meta: {
+      hideInMenu: true,
+    },
   },
   {
     path: '/my_space',

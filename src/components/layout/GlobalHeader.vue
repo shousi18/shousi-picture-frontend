@@ -28,6 +28,12 @@
               <template #overlay>
                 <a-menu>
                   <a-menu-item>
+                    <router-link to="/user/info">
+                      <SettingOutlined />
+                      我的信息
+                    </router-link>
+                  </a-menu-item>
+                  <a-menu-item>
                     <router-link to="/my_space">
                       <UserOutlined />
                       我的空间
@@ -51,7 +57,7 @@
 </template>
 <script lang="ts" setup>
 import { computed, h, ref } from 'vue'
-import { HomeOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons-vue'
+import { HomeOutlined, LogoutOutlined, UserOutlined, SettingOutlined } from '@ant-design/icons-vue'
 import { MenuProps, message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'

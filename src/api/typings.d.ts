@@ -107,6 +107,12 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponseMapStringString_ = {
+    code?: number
+    data?: Record<string, any>
+    message?: string
+  }
+
   type BaseResponsePagePictureVO_ = {
     code?: number
     data?: PagePictureVO_
@@ -212,6 +218,11 @@ declare namespace API {
     id?: number
   }
 
+  type EmailCodeRequest = {
+    email?: string
+    type?: string
+  }
+
   type getNameUsingGETParams = {
     /** name */
     name?: string
@@ -278,6 +289,8 @@ declare namespace API {
     vipExpireTime?: string
     vipNumber?: number
   }
+
+  type MapStringString_ = true
 
   type Output = {
     taskId?: string
@@ -692,6 +705,14 @@ declare namespace API {
     filePath?: string
   }
 
+  type updateUserAvatarUsingPOSTParams = {
+    id?: number
+    userAvatar?: string
+    userName?: string
+    userProfile?: string
+    userRole?: string
+  }
+
   type uploadPictureUsingPOSTParams = {
     fileUrl?: string
     id?: number
@@ -702,6 +723,7 @@ declare namespace API {
   type User = {
     createTime?: string
     editTime?: string
+    email?: string
     id?: number
     inviteUser?: number
     isDelete?: number
@@ -727,8 +749,10 @@ declare namespace API {
   }
 
   type UserLoginRequest = {
-    userAccount?: string
+    userAccountOrEmail?: string
     userPassword?: string
+    verifyCode?: string
+    verifyCodeId?: string
   }
 
   type UserQueryRequest = {
@@ -745,8 +769,17 @@ declare namespace API {
 
   type UserRegisterRequest = {
     checkPassword?: string
+    code?: string
+    email?: string
     userAccount?: string
     userPassword?: string
+  }
+
+  type UserUpdatePasswordRequest = {
+    checkPassword?: string
+    id?: number
+    newPassword?: string
+    oldPassword?: string
   }
 
   type UserUpdateRequest = {
@@ -759,6 +792,7 @@ declare namespace API {
 
   type UserVO = {
     createTime?: string
+    email?: string
     id?: number
     userAccount?: string
     userAvatar?: string
