@@ -70,7 +70,7 @@
               cancel-text="取消"
               @confirm="doDelete"
             >
-              <a-button :icon="h(DeleteOutlined)" v-if="canEdit" danger> 删除</a-button>
+              <a-button :icon="h(DeleteOutlined)" v-if="canDelete" danger> 删除 </a-button>
             </a-popconfirm>
             <a-button type="default" @click="doDownload">
               免费下载
@@ -157,6 +157,7 @@ import {
 import { PIC_REVIEW_STATUS_ENUM } from '@/constant/picture.ts'
 import ACCESS_ENUM from '@/access/accessEnum.ts'
 import ShareModal from '@/components/ShareModal.vue'
+import { SPACE_PERMISSION_ENUM } from '@/constant/space.ts'
 
 interface Props {
   id: number | string
@@ -175,13 +176,16 @@ const loginUserStore = useLoginUserStore()
 const shareLink = ref<string>()
 const shareModalRef = ref()
 
-const canEdit = computed(() => {
-  const loginUser = loginUserStore.loginUser
-  if (!loginUser.id) {
-    return
-  }
-  return loginUser.id === picture.value?.userId || loginUser.userRole === 'admin'
-})
+// 通用权限检查函数
+function createPermissionChecker(permission: string) {
+  return computed(() => {
+    return (picture.value?.permissionList ?? []).includes(permission)
+  })
+}
+
+// 定义权限检查
+const canEdit = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_EDIT)
+const canDelete = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_DELETE)
 /**
  * 获取图片详细
  */

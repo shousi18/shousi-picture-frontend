@@ -29,7 +29,7 @@
               </template>
             </a-card-meta>
             <template v-if="showOp" #actions>
-              <a-space @click="(e) => doShare(picture, e)" >
+              <a-space @click="(e) => doShare(picture, e)">
                 <share-alt-outlined />
                 分享
               </a-space>
@@ -37,11 +37,11 @@
                 <search-outlined />
                 搜索
               </a-space>
-              <a-space @click="(e) => doEdit(picture, e)">
+              <a-space v-if="canEdit" @click="(e) => doEdit(picture, e)">
                 <edit-outlined />
                 编辑
               </a-space>
-              <a-space @click="(e) => doDelete(picture, e)">
+              <a-space v-if="canDelete" @click="(e) => doDelete(picture, e)">
                 <delete-outlined />
                 删除
               </a-space>
@@ -73,12 +73,16 @@ interface Props {
   showOp?: boolean
   onReload?: () => void
   onSpaceReload?: () => void
+  canDelete?: boolean
+  canEdit?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   dataList: () => [],
   loading: false,
   showOp: false,
+  canEdit: false,
+  canDelete: false,
 })
 
 const router = useRouter()

@@ -1,7 +1,7 @@
 <template>
   <div id="addSpacePage">
     <h2 style="margin-bottom: 16px">
-      {{ oldSpace?.id ? '编辑私有空间' : '创建私有空间' }}
+      {{ oldSpace?.id ? '编辑' : '创建' }}{{ SPACE_TYPE_MAP[spaceType] }}
     </h2>
     <a-form layout="vertical" :model="formData" @finish="handleSubmit">
       <a-form-item label="空间名称" name="spaceName">
@@ -32,8 +32,13 @@
       <a-alert type="info" show-icon class="notice-alert">
         <template #message>
           当前仅支持开通普通版，升级空间请直接联系
-          <a href="https://blog.csdn.net/weixin_74879735?type=blog" target="_blank" class="contact-link">
-            向阳256 <icon-link-outlined />
+          <a
+            href="https://blog.csdn.net/weixin_74879735?type=blog"
+            target="_blank"
+            class="contact-link"
+          >
+            向阳256
+            <icon-link-outlined />
           </a>
         </template>
       </a-alert>
@@ -74,17 +79,22 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { message } from 'ant-design-vue'
 import { useRoute, useRouter } from 'vue-router'
-import { SPACE_LEVEL_ENUM, SPACE_LEVEL_OPTIONS } from '@/constant/space.ts'
+import {
+  SPACE_LEVEL_ENUM,
+  SPACE_LEVEL_OPTIONS,
+  SPACE_TYPE_ENUM,
+  SPACE_TYPE_MAP,
+} from '@/constant/space.ts'
 import {
   addSpaceUsingPost,
   getSpaceVoByIdUsingGet,
   listSpaceLevelUsingGet,
-  updateSpaceUsingPost
+  updateSpaceUsingPost,
 } from '@/api/spaceController.ts'
-import { formatFileSize } from '../../utils'
+import { formatFileSize } from '@/utils'
 
 const formData = reactive<API.SpaceAddRequest | API.SpaceUpdateRequest>({
   spaceName: '',
@@ -97,6 +107,13 @@ const route = useRoute()
 
 const spaceLevelList = ref<API.SpaceLevel[]>([])
 const oldSpace = ref<API.SpaceVO>()
+// 空间类别
+const spaceType = computed(() => {
+  if (typeof route.query?.type) {
+    return Number(route.query?.type)
+  }
+  return SPACE_TYPE_ENUM.PRIVATE
+})
 
 /**
  * 获取老数据
@@ -124,16 +141,18 @@ const getOldSpace = async () => {
 const handleSubmit = async (values: any) => {
   loading.value = true
   const spaceId = oldSpace.value?.id
-  let res;
+  let res
   // 更新操作
   if (spaceId) {
     res = await updateSpaceUsingPost({
       id: spaceId,
       ...formData,
     })
-  }else {
+  } else {
+    // 创建时传入空间类型
     res = await addSpaceUsingPost({
       ...formData,
+      spaceType: spaceType.value,
     })
   }
   if (res.data.code === 0 && res.data.data) {
