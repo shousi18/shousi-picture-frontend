@@ -2,6 +2,21 @@
 /* eslint-disable */
 import request from '@/request'
 
+/** clearEditHistory POST /api/picture/clear_history */
+export async function clearEditHistoryUsingPost(
+  body: API.PictureEditClearRequest,
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponseString_>('/api/picture/clear_history', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  })
+}
+
 /** deletePicture POST /api/picture/delete */
 export async function deletePictureUsingPost(
   body: API.DeleteRequest,

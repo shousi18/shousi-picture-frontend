@@ -43,7 +43,7 @@
 
 <script lang="ts" setup>
 import { computed, onUnmounted, ref, watchEffect } from 'vue'
-import { uploadPictureUsingPost } from '@/api/pictureController.ts'
+import { clearEditHistoryUsingPost, uploadPictureUsingPost } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
 import PictureEditWebSocket from '@/utils/pictureEditWebSocket.ts'
@@ -141,13 +141,23 @@ const closeModal = () => {
   // 断开连接
   if (webSocket) {
     webSocket.disconnect()
+    clearHistory()
   }
   editingUser.value = undefined
 }
 
+const clearHistory = async () => {
+  const params = {
+    pictureId: props.picture?.id,
+    spaceId: props.spaceId
+  }
+  // 清除历史操作
+  await clearEditHistoryUsingPost(params)
+}
+
 // 暴露函数给父组件
 defineExpose({
-  openModal,
+  openModal
 })
 
 // ----- 实时编辑
@@ -178,10 +188,9 @@ const enterEdit = () => {
   if (webSocket) {
     // 发送进入编辑状态的消息
     webSocket.sendMessage({
-      type: PICTURE_EDIT_MESSAGE_TYPE_ENUM.ENTER_EDIT,
+      type: PICTURE_EDIT_MESSAGE_TYPE_ENUM.ENTER_EDIT
     })
   }
-
 }
 /**
  * 退出编辑状态
@@ -190,7 +199,7 @@ const exitEdit = () => {
   if (webSocket) {
     // 发送退出编辑状态的消息
     webSocket.sendMessage({
-      type: PICTURE_EDIT_MESSAGE_TYPE_ENUM.EXIT_EDIT,
+      type: PICTURE_EDIT_MESSAGE_TYPE_ENUM.EXIT_EDIT
     })
   }
 }
@@ -202,7 +211,7 @@ const editAction = (action: string) => {
   if (webSocket) {
     webSocket.sendMessage({
       type: PICTURE_EDIT_MESSAGE_TYPE_ENUM.EDIT_ACTION,
-      editAction: action,
+      editAction: action
     })
   }
 }
@@ -216,6 +225,10 @@ const initWebSocket = () => {
   console.log('pictureId:', pictureId)
   // 没有打开编辑弹框，或者没有图片ID，则不初始化webSocket
   if (!pictureId || !visible.value) {
+    return
+  }
+  // 私有空间不初始化webSocket
+  if (props.space.spaceType === SPACE_TYPE_ENUM.PRIVATE) {
     return
   }
   // 防止之前建立的连接没有释放
@@ -273,6 +286,31 @@ const initWebSocket = () => {
     message.info(msg.message)
     editingUser.value = undefined
   })
+
+  // 重放历史操作
+  webSocket.on('HISTORY', (msg) => {
+    msg.historyAction.forEach((action: string) => {
+      replayEditAction(action)
+    })
+  })
+}
+
+// 示例：重放历史操作
+const replayEditAction = (action: string) => {
+  switch (action) {
+    case PICTURE_EDIT_ACTION_ENUM.ROTATE_LEFT:
+      cropperRef.value.rotateLeft()
+      break
+    case PICTURE_EDIT_ACTION_ENUM.ROTATE_RIGHT:
+      cropperRef.value.rotateRight()
+      break
+    case PICTURE_EDIT_ACTION_ENUM.ZOOM_IN:
+      cropperRef.value.changeScale(1)
+      break
+    case PICTURE_EDIT_ACTION_ENUM.ZOOM_OUT:
+      cropperRef.value.changeScale(-1)
+      break
+  }
 }
 
 watchEffect(() => {

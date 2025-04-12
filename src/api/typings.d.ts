@@ -390,6 +390,11 @@ declare namespace API {
     tagIds?: number[]
   }
 
+  type PictureEditClearRequest = {
+    pictureId?: number
+    spaceId?: number
+  }
+
   type PictureEditRequest = {
     categoryId?: number
     id?: number
