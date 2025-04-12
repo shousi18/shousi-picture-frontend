@@ -4,7 +4,7 @@
       {{ route.query?.id ? '编辑图片' : '添加图片' }}
     </h2>
     <a-typography-paragraph v-if="spaceId" type="secondary">
-      保存至空间：<a :href="`/space/${spaceId}`" target="_blank">{{ spaceId }}</a>
+      保存至空间：<a :href="`/space/${spaceId}`" target="_blank">{{ space?.spaceName }}</a>
     </a-typography-paragraph>
     <a-tabs v-model:activeKey="uploadType">
       <a-tab-pane key="file" tab="文件上传">
@@ -27,6 +27,7 @@
         :imageUrl="picture?.url"
         :picture="picture"
         :spaceId="spaceId"
+        :space="space"
         :onSuccess="onCropSuccess"
       />
       <ImageOutPainting
@@ -77,7 +78,7 @@
 
 <script setup lang="ts">
 import PictureUpload from '@/components/picture/upload/PictureUpload.vue'
-import { computed, h, nextTick, onMounted, reactive, ref } from 'vue'
+import { computed, h, nextTick, onMounted, reactive, ref, watchEffect } from 'vue'
 import { editPictureUsingPost, getPictureVoByIdUsingGet } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -87,6 +88,7 @@ import UrlPictureUpload from '@/components/picture/upload/UrlPictureUpload.vue'
 import { EditOutlined, FullscreenOutlined } from '@ant-design/icons-vue'
 import ImageCropper from '@/components/picture/edit/ImageCropper.vue'
 import ImageOutPainting from '@/components/picture/ImageOutPainting.vue'
+import { getSpaceVoByIdUsingGet } from '@/api/spaceController.ts'
 
 const picture = ref<API.PictureVO>()
 const categoryOptions = ref<any>([])
@@ -104,6 +106,25 @@ const uploadType = ref<'file' | 'url'>('file')
 
 const spaceId = computed(() => {
   return route.query?.spaceId
+})
+
+const space = ref<API.SpaceVO>()
+
+// 获取空间信息
+const fetchSpace = async () => {
+  // 获取数据
+  if (spaceId.value) {
+    const res = await getSpaceVoByIdUsingGet({
+      id: spaceId.value,
+    })
+    if (res.data.code === 0 && res.data.data) {
+      space.value = res.data.data
+    }
+  }
+}
+
+watchEffect(() => {
+  fetchSpace()
 })
 
 // AI 扩图弹窗容器引用
