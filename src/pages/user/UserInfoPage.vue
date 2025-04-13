@@ -24,6 +24,9 @@
               <a-descriptions-item label="用户账号">
                 {{ userInfo.userAccount }}
               </a-descriptions-item>
+              <a-descriptions-item label="我的id">
+                {{ userInfo.id }}
+              </a-descriptions-item>
               <a-descriptions-item label="注册时间">
                 {{ formatTime(userInfo.createTime) }}
               </a-descriptions-item>
@@ -60,14 +63,43 @@
               </template>
               关于作者
             </a-button>
-            <a-button block danger class="action-btn" @click="handleLogout">
+            <a-button block type="primary" ghost class="action-btn" @click="showExchangeModal = true">
               <template #icon>
-                <LogoutOutlined />
+                <MoneyCollectOutlined />
               </template>
-              注销账号
+              兑换会员
             </a-button>
           </div>
         </a-card>
+        <a-modal
+          v-model:visible="showExchangeModal"
+          title="兑换会员"
+          ok-text="确认兑换"
+          @ok="handleExchange"
+          cancel-text="取消"
+          @cancel="handleCancel"
+          :confirm-loading="memberLoading"
+        >
+          <a-form :model="formState" :rules="rules" layout="vertical">
+            <a-form-item label="会员兑换码" name="code">
+              <a-input
+                v-model:value="formState.code"
+                placeholder="请输入16位会员兑换码"
+                maxlength="16"
+                show-count
+              />
+            </a-form-item>
+          </a-form>
+          <div class="text-gray-600 text-sm">
+            如需要会员，请联系管理员进行购买：
+            <a-tooltip placement="bottom">
+              <template #title>
+                <img :src="wechat" alt="微信" width="120" />
+              </template>
+              <a class="text-blue-500">向日葵</a>
+            </a-tooltip>
+          </div>
+        </a-modal>
       </a-col>
     </a-row>
 
@@ -86,19 +118,21 @@
 import {
   EditOutlined,
   LockOutlined,
-  LogoutOutlined,
+  MoneyCollectOutlined,
   MailOutlined,
   UserOutlined,
 } from '@ant-design/icons-vue'
 import { message, Modal } from 'ant-design-vue'
-import { onMounted, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import dayjs from 'dayjs'
-import { getUserVoByIdUsingGet } from '@/api/userController.ts'
+import { exchangeMemberUsingPost, getUserVoByIdUsingGet } from '@/api/userController.ts'
 import { useRouter } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
 import EditPasswordModal from '@/components/userinfo/EditPasswordModal.vue'
 import EditUserInfoModal from '@/components/userinfo/EditUserInfoModal.vue'
 import EditEmailModal from '@/components/userinfo/EditEmailModal.vue'
+import type { Rule } from 'ant-design-vue/es/form'
+import wechat from '@/assets/wechat.png'
 
 // 原有逻辑保持不变，新增以下内容
 const loading = ref(false)
@@ -167,18 +201,60 @@ const showAboutModal = () => {
   })
 }
 
-const handleLogout = () => {
-  Modal.confirm({
-    title: '确定要注销账号吗？',
-    content: '此操作将永久删除您的账户！',
-    okText: '确定',
-    okType: 'danger',
-    cancelText: '取消',
-    onOk() {
-      // 执行注销逻辑
-    },
-  })
+// ----- 兑换会员 -----
+interface FormState {
+  code: string;
 }
+
+// 表单状态
+const formState = reactive<FormState>({
+  code: '',
+});
+
+// 验证规则
+const rules: Record<string, Rule[]> = {
+  code: [
+    { required: true, message: '请输入兑换码' },
+    { len: 16, message: '兑换码必须是16位字符' },
+    { pattern: /^[A-Z0-9]+$/, message: '兑换码只能包含大写字母和数字' }
+  ],
+};
+
+// 控制模态框显示
+const showExchangeModal = ref(false);
+// 加载状态
+const memberLoading = ref(false);
+
+// 兑换处理
+const handleExchange = async () => {
+  try {
+    memberLoading.value = true;
+    // 调用后端接口
+    const res = await exchangeMemberUsingPost({
+      userId: loginUserStore.loginUser.id,
+      code: formState.code
+    });
+
+    if (res.data.code === 0) {
+      message.success('兑换成功！');
+      showExchangeModal.value = false;
+      fetchUserInfo()
+    } else {
+      message.error(`兑换失败：${res.data.message}`);
+    }
+  } catch (error) {
+    message.error('兑换请求失败，请稍后重试');
+  } finally {
+    memberLoading.value = false;
+    handleCancel()
+  }
+};
+
+// 取消处理
+const handleCancel = () => {
+  formState.code = '';
+  showExchangeModal.value = false;
+};
 </script>
 
 <style scoped>

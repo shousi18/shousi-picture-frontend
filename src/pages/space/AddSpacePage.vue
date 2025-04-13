@@ -32,14 +32,12 @@
       <a-alert type="info" show-icon class="notice-alert">
         <template #message>
           当前仅支持开通普通版，升级空间请直接联系
-          <a
-            href="https://blog.csdn.net/weixin_74879735?type=blog"
-            target="_blank"
-            class="contact-link"
-          >
-            向阳256
-            <icon-link-outlined />
-          </a>
+          <a-tooltip placement="bottom">
+            <template #title>
+              <img :src="wechat" alt="微信" width="120" />
+            </template>
+            <a class="text-blue-500">向日葵</a>
+          </a-tooltip>
         </template>
       </a-alert>
 
@@ -95,6 +93,7 @@ import {
   updateSpaceUsingPost,
 } from '@/api/spaceController.ts'
 import { formatFileSize } from '@/utils'
+import wechat from '@/assets/wechat.png'
 
 const formData = reactive<API.SpaceAddRequest | API.SpaceUpdateRequest>({
   spaceName: '',

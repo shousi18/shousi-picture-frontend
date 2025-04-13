@@ -46,6 +46,12 @@
                       我的发布
                     </router-link>
                   </a-menu-item>
+                  <a-menu-item>
+                    <router-link to="/my_message">
+                      <MessageOutlined />
+                      我的消息
+                    </router-link>
+                  </a-menu-item>
                   <a-menu-item @click="doLogout">
                     <LogoutOutlined />
                     退出登录
@@ -64,7 +70,7 @@
 </template>
 <script lang="ts" setup>
 import { computed, h, ref } from 'vue'
-import { UploadOutlined, LogoutOutlined, UserOutlined, SettingOutlined } from '@ant-design/icons-vue'
+import { UploadOutlined, LogoutOutlined, UserOutlined, SettingOutlined, MessageOutlined } from '@ant-design/icons-vue'
 import { MenuProps, message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'

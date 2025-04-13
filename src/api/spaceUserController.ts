@@ -62,6 +62,29 @@ export async function getSpaceUserUsingPost(
   })
 }
 
+/** handleInvitation POST /api/spaceUser/handleInvitation */
+export async function handleInvitationUsingPost(
+  body: API.HandleInvitationRequest,
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponseBoolean_>('/api/spaceUser/handleInvitation', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  })
+}
+
+/** getPendingInvitations GET /api/spaceUser/invitations */
+export async function getPendingInvitationsUsingGet(options?: { [key: string]: any }) {
+  return request<API.BaseResponseListSpaceUserVO_>('/api/spaceUser/invitations', {
+    method: 'GET',
+    ...(options || {}),
+  })
+}
+
 /** listSpaceUser POST /api/spaceUser/list */
 export async function listSpaceUserUsingPost(
   body: API.SpaceUserQueryRequest,

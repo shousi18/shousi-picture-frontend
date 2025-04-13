@@ -46,6 +46,22 @@
                 删除
               </a-space>
             </template>
+
+            <!-- 新增状态显示区域 -->
+            <div v-if="userId" class="status-info">
+              <a-space v-if="picture.reviewStatus === PIC_REVIEW_STATUS_ENUM.PASS">
+                <check-circle-outlined style="color: #10b981; font-size: 16px" />
+                <span class="status-pass">已通过</span>
+              </a-space>
+              <a-space v-else-if="picture.reviewStatus === PIC_REVIEW_STATUS_ENUM.REJECT">
+                <close-circle-outlined style="color: #ef4444; font-size: 16px" />
+                <span class="status-reject">已拒绝：{{ picture?.reviewMessage}}</span>
+              </a-space>
+              <a-space v-else-if="picture.reviewStatus === PIC_REVIEW_STATUS_ENUM.REVIEWING">
+                <clock-circle-outlined style="color: #64748b; font-size: 16px" />
+                <span class="status-pending">待审核</span>
+              </a-space>
+            </div>
           </a-card>
         </a-list-item>
       </template>
@@ -61,11 +77,16 @@ import {
   SearchOutlined,
   DeleteOutlined,
   EditOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+  ClockCircleOutlined,
 } from '@ant-design/icons-vue'
 import { deletePictureUsingPost } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
 import ShareModal from '@/components/ShareModal.vue'
 import { ref } from 'vue'
+import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
+import { PIC_REVIEW_STATUS_ENUM } from '@/constant/picture.ts'
 
 interface Props {
   dataList?: API.PictureVO[]
@@ -75,6 +96,7 @@ interface Props {
   onSpaceReload?: () => void
   canDelete?: boolean
   canEdit?: boolean
+  userId: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -83,7 +105,11 @@ const props = withDefaults(defineProps<Props>(), {
   showOp: false,
   canEdit: false,
   canDelete: false,
+  userId: undefined,
 })
+
+const loginUserStore = useLoginUserStore()
+const loginUser = loginUserStore.loginUser
 
 const router = useRouter()
 // 弹窗实例
@@ -271,5 +297,25 @@ const doDelete = (picture, e) => {
   .pictureList .ant-card-cover img {
     height: 160px;
   }
+}
+
+/* 新增状态样式 */
+.status-info {
+  border-top: 2px solid rgba(0, 0, 0, 0.04);
+}
+
+.status-pass {
+  color: #10b981;
+  font-weight: 500;
+}
+
+.status-reject {
+  color: #ef4444;
+  font-weight: 500;
+}
+
+.status-pending {
+  color: #64748b;
+  font-weight: 500;
 }
 </style>

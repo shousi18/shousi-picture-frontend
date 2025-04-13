@@ -12,7 +12,7 @@
       <a-form-item label="分类" name="categoryId">
         <a-select
           v-model:value="searchParams.categoryId"
-          style="min-width: 180px"
+          style="min-width: 120px"
           :options="categoryOptions"
           placeholder="请输入分类"
           allowClear
@@ -37,6 +37,15 @@
           format="YYYY-MM-DD HH:mm:ss"
           :presets="rangePresets"
           @change="onRangeChange"
+        />
+      </a-form-item>
+      <a-form-item v-if="userId" label="审核状态" name="reviewStatus">
+        <a-select
+          v-model:value="searchParams.reviewStatus"
+          style="min-width: 120px"
+          :options="PIC_REVIEW_STATUS_OPTIONS"
+          placeholder="请选择审核状态"
+          allowClear
         />
       </a-form-item>
       <a-collapse v-model:activeKey="activeKey" :bordered="false">
@@ -74,9 +83,11 @@ import dayjs from 'dayjs'
 import { listHotTagsUsingGet } from '@/api/tagController.ts'
 import { listHotCategoriesUsingGet } from '@/api/categoryController.ts'
 import { message } from 'ant-design-vue'
+import { PIC_REVIEW_STATUS_OPTIONS } from '@/constant/picture.ts'
 
 interface Props {
   onSearch?: (searchParams: API.PictureQueryRequest) => void
+  userId?: number
 }
 
 const props = defineProps<Props>()

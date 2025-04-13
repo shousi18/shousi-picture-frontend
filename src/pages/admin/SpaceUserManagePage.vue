@@ -1,25 +1,30 @@
 <template>
   <div id="userManagePage">
-    <a-flex justify="space-between">
-      <h2>空间管理</h2>
-      <a-space>
-        <a-button type="primary" href="/add_space" target="_blank">+ 创建空间</a-button>
-        <a-button type="primary" ghost href="/space_analyze?queryPublic=1" target="_blank">
-          分析公共图库
-        </a-button>
-        <a-button type="primary" ghost href="/space_analyze?queryAll=1" target="_blank">
-          分析全空间
-        </a-button>
-      </a-space>
+    <h2>空间成员管理</h2>
+    <a-flex gap="large">
+      <a-form layout="inline" :model="formData" @finish="handleSubmit">
+        <a-form-item label="用户 id" name="userId">
+          <a-input v-model:value="formData.userId" placeholder="请输入用户 id" allow-clear />
+        </a-form-item>
+        <a-form-item>
+          <a-button type="primary" html-type="submit">邀请用户</a-button>
+        </a-form-item>
+      </a-form>
+      <a-form layout="inline" :model="selectFormData" @finish="handleSelectSubmit">
+        <a-form-item name="inviteStatus" label="用户受邀状态">
+          <a-select
+            allow-clear
+            v-model:value="selectFormData.inviteStatus"
+            :options="SPACE_USER_STATUS_OPTIONS"
+            placeholder="请查看邀请的用户状态"
+            style="min-width: 210px"
+          />
+        </a-form-item>
+        <a-form-item>
+          <a-button type="primary" html-type="submit">搜索</a-button>
+        </a-form-item>
+      </a-form>
     </a-flex>
-    <a-form layout="inline" :model="formData" @finish="handleSubmit">
-      <a-form-item label="用户 id" name="userId">
-        <a-input v-model:value="formData.userId" placeholder="请输入用户 id" allow-clear />
-      </a-form-item>
-      <a-form-item>
-        <a-button type="primary" html-type="submit">添加用户</a-button>
-      </a-form-item>
-    </a-form>
     <div style="margin-bottom: 16px" />
     <!-- 表格 -->
     <a-table :columns="columns" :data-source="dataList">
@@ -37,6 +42,9 @@
             @change="(value) => editSpaceRole(value, record)"
           />
         </template>
+        <template v-if="column.dataIndex === 'inviteStatus'">
+          {{ SPACE_USER_STATUS_MAP[record.inviteStatus] }}
+        </template>
         <template v-else-if="column.dataIndex === 'createTime'">
           {{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}
         </template>
@@ -51,12 +59,15 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { message } from 'ant-design-vue'
 import dayjs from 'dayjs'
-import { deleteSpaceUsingPost, listSpaceByPageUsingPost } from '@/api/spaceController.ts'
-import { SPACE_LEVEL_MAP, SPACE_LEVEL_OPTIONS, SPACE_ROLE_OPTIONS, SPACE_USER_STATUS_ENUM } from '@/constant/space.ts'
-import { formatFileSize } from '@/utils'
+import {
+  SPACE_ROLE_OPTIONS,
+  SPACE_USER_STATUS_ENUM,
+  SPACE_USER_STATUS_MAP,
+  SPACE_USER_STATUS_OPTIONS,
+} from '@/constant/space.ts'
 import {
   addSpaceUserUsingPost,
   deleteSpaceUserUsingPost,
@@ -76,7 +87,11 @@ const columns = [
     dataIndex: 'spaceRole',
   },
   {
-    title: '创建时间',
+    title: '邀请状态',
+    dataIndex: 'inviteStatus',
+  },
+  {
+    title: '邀请时间',
     dataIndex: 'createTime',
   },
   {
@@ -93,10 +108,10 @@ const props = defineProps<Props>()
 // 数据
 const dataList = ref([])
 
-// 添加用户
+// 邀请用户
 const formData = reactive<API.SpaceUserAddRequest>({})
 const loginUserStore = useLoginUserStore()
-
+const selectFormData = reactive<API.SpaceUserQueryRequest>({})
 /**
  * 提交表单
  */
@@ -111,11 +126,11 @@ const handleSubmit = async () => {
     ...formData,
   })
   if (res.data.code === 0) {
-    message.success('添加成功')
+    message.success('邀请成功')
     // 刷新数据
     fetchData()
   } else {
-    message.error('添加失败，' + res.data.message)
+    message.error('邀请失败，' + res.data.message)
   }
 }
 
@@ -129,6 +144,24 @@ const fetchData = async () => {
     spaceId,
     inviteStatus: SPACE_USER_STATUS_ENUM.AGREE,
   })
+  if (res.data.data) {
+    dataList.value = res.data.data ?? []
+  } else {
+    message.error('获取数据失败，' + res.data.message)
+  }
+}
+
+const handleSelectSubmit = async () => {
+  const spaceId = props.id
+  if (!spaceId) {
+    return
+  }
+  const params = {
+    spaceId,
+    inviteStatus: selectFormData.inviteStatus,
+  }
+  console.log(params)
+  const res = await listSpaceUserUsingPost(params)
   if (res.data.data) {
     dataList.value = res.data.data ?? []
   } else {

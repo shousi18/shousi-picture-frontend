@@ -1,37 +1,24 @@
 <template>
   <div id="spaceDetailPage">
     <!-- 空间信息 -->
-    <a-flex justify="space-between">
-      <h2>我发布的图片</h2>
-      <a-space size="middle">
-        <a-button v-if="canUploadPicture" type="primary" :href="`/add_picture?spaceId=${id}`"> + 创建图片</a-button>
-        <a-button v-if="canEditPicture" type="primary" :icon="h(EditOutlined)" @click="doBatchEdit"> 批量编辑</a-button>
-        <a-button v-if="canManageSpaceUser && space?.spaceType === SPACE_TYPE_ENUM.TEAM" type="primary" ghost :icon="h(TeamOutlined)" :href="`/spaceUserManage/${id}`">
-          成员管理
-        </a-button>
-      </a-space>
-    </a-flex>
-    <PictureSearchForm :on-search="onSearch" />
-    <!-- 按颜色搜索 -->
-    <a-form-item label="按颜色搜索" style="margin-top: 16px">
-      <color-picker format="hex" @pureColorChange="onColorChange" />
-    </a-form-item>
+    <h2>我发布的图片</h2>
+    <PictureSearchForm :on-search="onSearch" :userId="loginUser.id" />
     <!-- 图片列表 -->
     <PictureList
       :dataList="dataList"
       :loading="loading"
       :show-op="true"
       :on-reload="fetchData"
-      :canEdit="canEditPicture"
-      :canDelete="canDeletePicture"
-      :on-space-reload="fetchSpaceDetail"
+      :canEdit="true"
+      :canDelete="true"
+      :user-id="loginUser.id"
     />
     <a-pagination
       style="text-align: right"
       v-model:current="searchParams.current"
       v-model:pageSize="searchParams.pageSize"
       :total="total"
-      :show-total="() => `图片总数 ${total} / ${space?.maxCount}`"
+      :show-total="() => `共 ${total} 条`"
       @change="onPageChange"
     />
     <BatchEditPictureModal
@@ -44,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, h, onMounted, reactive, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import {
   listPictureVoByPageUsingPost,
   searchPictureByColorUsingPost,
@@ -57,8 +44,8 @@ import PictureSearchForm from '@/components/picture/PictureSearchForm.vue'
 import { ColorPicker } from 'vue3-colorpicker'
 import 'vue3-colorpicker/style.css'
 import BatchEditPictureModal from '@/components/picture/edit/BatchEditPictureModal.vue'
-import { EditOutlined, BarChartOutlined, TeamOutlined } from '@ant-design/icons-vue'
-import { SPACE_PERMISSION_ENUM, SPACE_TYPE_ENUM, SPACE_TYPE_MAP } from '../../constant/space.ts'
+import { SPACE_PERMISSION_ENUM } from '../../constant/space.ts'
+import { useRouter } from 'vue-router'
 
 interface Props {
   id: number | string
@@ -67,7 +54,7 @@ interface Props {
 // 搜索条件
 const searchParams = ref<API.PictureQueryRequest>({
   current: 1,
-  pageSize: 12,
+  pageSize: 20,
   sortField: 'createTime',
   sortOrder: 'descend',
 })
@@ -81,7 +68,6 @@ const batchEditPictureModalRef = ref()
 const onColorChange = async (color: string) => {
   const res = await searchPictureByColorUsingPost({
     picColor: color,
-    spaceId: props.id,
   })
   if (res.data.code === 0 && res.data.data) {
     const data = res.data.data ?? []
@@ -94,6 +80,9 @@ const onColorChange = async (color: string) => {
 
 const props = defineProps<Props>()
 const loginUserStore = useLoginUserStore()
+const loginUser = computed(() => loginUserStore.loginUser)
+
+const router = useRouter()
 
 const space = ref<API.SpaceVO>()
 
@@ -109,34 +98,25 @@ function createPermissionChecker(permission: string) {
 }
 
 // 定义权限检查
-const canManageSpaceUser = createPermissionChecker(SPACE_PERMISSION_ENUM.SPACE_USER_MANAGE)
-const canUploadPicture = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_UPLOAD)
 const canEditPicture = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_EDIT)
 const canDeletePicture = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_DELETE)
 
-/**
- * 获取图片详细
- */
-const fetchSpaceDetail = async () => {
-  if (!props.id) {
-    return
-  }
-  const res = await getSpaceVoByIdUsingGet({ id: props.id })
-  if (res.data.code === 0 && res.data.data) {
-    space.value = res.data.data
-  } else {
-    message.error('获取空间详细失败，' + res.data.message)
-  }
-}
 
 /**
  * 获取数据
  */
 const fetchData = async () => {
+  if (!loginUser.value.id) {
+    router.push({
+      path: '/user/login',
+    })
+    return
+  }
   loading.value = true
   // 转换搜索参数
   const params = {
     spaceId: props.id,
+    userId: loginUser.value.id,
     ...searchParams.value,
   }
   const res = await listPictureVoByPageUsingPost(params)
@@ -158,25 +138,14 @@ const onBatchEditPictureSuccess = () => {
 
 onMounted(() => {
   fetchData()
-  fetchSpaceDetail()
 })
 
 watch(
   () => props.id,
   (newSpaceId) => {
     fetchData()
-    fetchSpaceDetail()
   },
 )
-
-/**
- * 打开批量编辑弹窗
- */
-const doBatchEdit = () => {
-  if (batchEditPictureModalRef.value) {
-    batchEditPictureModalRef.value.openModal()
-  }
-}
 
 const onPageChange = (page, pageSize) => {
   searchParams.value.current = page

@@ -1,6 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router'
 import HomePage from '@/pages/HomePage.vue'
-import { HomeOutlined, PlusCircleOutlined } from '@ant-design/icons-vue'
+import { HomeOutlined, MessageOutlined, PlusCircleOutlined, UploadOutlined } from '@ant-design/icons-vue'
 import UserLoginPage from '@/pages/user/UserLoginPage.vue'
 import UserRegisterPage from '@/pages/user/UserRegisterPage.vue'
 import UserManagePage from '@/pages/admin/UserManagePage.vue'
@@ -20,6 +20,7 @@ import SpaceAnalyzePage from '@/pages/analyze/SpaceAnalyzePage.vue'
 import SpaceUserManagePage from '@/pages/admin/SpaceUserManagePage.vue'
 import UserInfoPage from '@/pages/user/UserInfoPage.vue'
 import MyPicturesPage from '@/pages/user/MyPicturesPage.vue'
+import MyMessagePage from '@/pages/user/MyMessagePage.vue'
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -135,8 +136,16 @@ export const routes: Array<RouteRecordRaw> = [
     name: '我的发布',
     component: MyPicturesPage,
     meta: {
-      hideInMenu: true,
-    }
+      icon: () => h(UploadOutlined),
+    },
+  },
+  {
+    path: '/my_message',
+    name: '我的消息',
+    component: MyMessagePage,
+    meta: {
+      icon: () => h(MessageOutlined),
+    },
   },
   {
     path: '/picture/:id',

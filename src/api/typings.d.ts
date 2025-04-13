@@ -223,6 +223,11 @@ declare namespace API {
     type?: string
   }
 
+  type ExchangeMemberRequest = {
+    code?: string
+    userId?: number
+  }
+
   type getNameUsingGETParams = {
     /** name */
     name?: string
@@ -266,6 +271,12 @@ declare namespace API {
   type getUserVOByIdUsingGETParams = {
     /** id */
     id?: number
+  }
+
+  type HandleInvitationRequest = {
+    id?: number
+    spaceId?: number
+    status?: number
   }
 
   type ImageSearchResult = {
