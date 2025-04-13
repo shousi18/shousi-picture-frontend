@@ -1,6 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router'
 import HomePage from '@/pages/HomePage.vue'
-import { HomeOutlined } from '@ant-design/icons-vue'
+import { HomeOutlined, PlusCircleOutlined } from '@ant-design/icons-vue'
 import UserLoginPage from '@/pages/user/UserLoginPage.vue'
 import UserRegisterPage from '@/pages/user/UserRegisterPage.vue'
 import UserManagePage from '@/pages/admin/UserManagePage.vue'
@@ -19,6 +19,7 @@ import SearchPictureBySoPage from '@/pages/picture/SearchPictureBySoPage.vue'
 import SpaceAnalyzePage from '@/pages/analyze/SpaceAnalyzePage.vue'
 import SpaceUserManagePage from '@/pages/admin/SpaceUserManagePage.vue'
 import UserInfoPage from '@/pages/user/UserInfoPage.vue'
+import MyPicturesPage from '@/pages/user/MyPicturesPage.vue'
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -35,6 +36,7 @@ export const routes: Array<RouteRecordRaw> = [
     component: UserLoginPage,
     meta: {
       hideInMenu: true,
+      access: ACCESS_ENUM.NOT_LOGIN,
     },
   },
   {
@@ -76,6 +78,7 @@ export const routes: Array<RouteRecordRaw> = [
     component: UserRegisterPage,
     meta: {
       hideInMenu: true,
+      access: ACCESS_ENUM.NOT_LOGIN,
     },
   },
   {
@@ -90,6 +93,9 @@ export const routes: Array<RouteRecordRaw> = [
     path: '/add_picture',
     name: '创建图片',
     component: AddPicturePage,
+    meta: {
+      icon: () => h(PlusCircleOutlined),
+    }
   },
   {
     path: '/add_picture/batch',
@@ -123,6 +129,14 @@ export const routes: Array<RouteRecordRaw> = [
     meta: {
       hideInMenu: true,
     },
+  },
+  {
+    path: '/my_pictures',
+    name: '我的发布',
+    component: MyPicturesPage,
+    meta: {
+      hideInMenu: true,
+    }
   },
   {
     path: '/picture/:id',

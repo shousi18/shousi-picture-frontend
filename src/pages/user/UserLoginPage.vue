@@ -18,7 +18,7 @@
         name="userPassword"
         :rules="[
           { required: true, message: '请输入密码', trigger: 'blur' },
-          { min: 8, message: '密码长度不能小于 8 位' },
+          { min: 8, message: '密码长度不能小于 8 位', trigger: 'blur' },
         ]"
       >
         <a-input-password
@@ -32,8 +32,8 @@
       <a-form-item
         name="verifyCode"
         :rules="[
-          { required: true, message: '请输入验证码' },
-          { min: 4, message: '验证码长度为 4 位' },
+          { required: true, message: '请输入验证码', trigger: 'blur' },
+          { min: 4, message: '验证码长度为 4 位', trigger: 'blur' },
         ]"
       >
         <div class="verify-code-container">
@@ -54,7 +54,7 @@
         <RouterLink to="/user/register">去注册</RouterLink>
       </div>
       <a-form-item>
-        <a-button type="primary" html-type="submit" style="width: 100%">登录</a-button>
+        <a-button class="login-button" type="primary" html-type="submit" style="width: 100%">登录</a-button>
       </a-form-item>
     </a-form>
   </div>
@@ -128,12 +128,14 @@ onMounted(() => {
 <style scoped>
 #userLoginPage {
   max-width: 360px;
-  margin: 0 auto;
+  margin: 80px auto;
 }
 
 .title {
   text-align: center;
   margin-bottom: 16px;
+  font-size: 24px;
+  font-weight: bold;
 }
 
 .desc {
@@ -185,5 +187,26 @@ onMounted(() => {
       padding: 2px;
     }
   }
+}
+
+.login-button {
+  width: 100%;
+  height: 36px;
+  border-radius: 12px;
+  background: linear-gradient(to right, #f6d365 0%, #fda085 100%);
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: linear-gradient(to right, #f6d365 0%, #fda085 100%);
+  }
+
+  &:active {
+    background: linear-gradient(to right, #f6d365 0%, #fda085 100%);
+    }
 }
 </style>

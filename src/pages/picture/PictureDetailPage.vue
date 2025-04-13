@@ -3,14 +3,16 @@
     <a-row :gutter="[16, 16]">
       <!-- 图片展示区 -->
       <a-col :sm="24" :md="16" :xl="18">
-        <a-card title="图片预览">
-          <a-image style="max-height: 600px; object-fit: contain" :src="picture?.url" />
+        <a-card class="preview-picture-card">
+          <div class="image-container">
+            <a-image style="max-height: 600px; object-fit: contain" :src="picture?.url" />
+          </div>
         </a-card>
       </a-col>
       <!-- 图片信息区 -->
       <a-col :sm="24" :md="8" :xl="6">
         <a-card title="图片信息">
-          <a-descriptions :column="1">
+          <a-descriptions :column="1" class="info-descriptions">
             <a-descriptions-item label="作者">
               <a-space>
                 <a-avatar :size="24" :src="picture?.user?.userAvatar" />
@@ -60,57 +62,55 @@
               </a-space>
             </a-descriptions-item>
           </a-descriptions>
-          <a-space wrap>
-            <a-button :icon="h(EditOutlined)" v-if="canEdit" type="default" @click="doEdit">
-              编辑
-            </a-button>
-            <a-popconfirm
-              title="你确认删除该图片吗？"
-              ok-text="确认"
-              cancel-text="取消"
-              @confirm="doDelete"
-            >
-              <a-button :icon="h(DeleteOutlined)" v-if="canDelete" danger> 删除 </a-button>
-            </a-popconfirm>
-            <a-button type="default" @click="doDownload">
-              免费下载
-              <template #icon>
+          <div class="custom-actions">
+            <a-space wrap align="start">
+              <a-button v-if="canEdit" type="primary" @click="doEdit" class="action-btn edit-btn">
+                <EditOutlined />
+              </a-button>
+              <a-popconfirm
+                title="你确认删除该图片吗？"
+                ok-text="确认"
+                cancel-text="取消"
+                @confirm="doDelete"
+              >
+                <a-button type="primary" v-if="canDelete" danger class="action-btn delete-btn">
+                  <DeleteOutlined />
+                </a-button>
+              </a-popconfirm>
+              <a-button type="primary" @click="doDownload" class="action-btn download-btn">
                 <DownloadOutlined />
-              </template>
-            </a-button>
-            <a-button type="primary" ghost @click="doShare">
-              分享
-              <template #icon>
+              </a-button>
+              <a-button type="primary" ghost @click="doShare" class="action-btn share-btn">
                 <share-alt-outlined />
-              </template>
-            </a-button>
-            <a-popconfirm
-              title="确认审核通过该图片吗？"
-              ok-text="确认"
-              cancel-text="取消"
-              @confirm="handleReview(picture, PIC_REVIEW_STATUS_ENUM.PASS)"
-            >
-              <a-button
-                v-if="
+              </a-button>
+              <a-popconfirm
+                title="确认审核通过该图片吗？"
+                ok-text="确认"
+                cancel-text="取消"
+                @confirm="handleReview(picture, PIC_REVIEW_STATUS_ENUM.PASS)"
+              >
+                <a-button
+                  v-if="
                   picture?.reviewStatus !== PIC_REVIEW_STATUS_ENUM.PASS &&
                   loginUserStore.loginUser.userRole === ACCESS_ENUM.ADMIN
                 "
-                type="link"
-              >
-                通过
-              </a-button>
-            </a-popconfirm>
-            <a-button
-              v-if="
+                  type="link"
+                >
+                  通过
+                </a-button>
+              </a-popconfirm>
+              <a-button
+                v-if="
                 picture?.reviewStatus !== PIC_REVIEW_STATUS_ENUM.REJECT &&
                 loginUserStore.loginUser.userRole === ACCESS_ENUM.ADMIN
               "
-              danger
-              @click="handleReview(picture, PIC_REVIEW_STATUS_ENUM.REJECT)"
-            >
-              拒绝
-            </a-button>
-          </a-space>
+                danger
+                @click="handleReview(picture, PIC_REVIEW_STATUS_ENUM.REJECT)"
+              >
+                拒绝
+              </a-button>
+            </a-space>
+          </div>
         </a-card>
       </a-col>
     </a-row>
@@ -314,4 +314,159 @@ const handleReject = async () => {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+/* 预览卡片样式优化 */
+.preview-picture-card {
+  background: #f9f9f9;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  overflow: hidden;
+
+  &:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  }
+}
+
+/* 图片容器样式优化 */
+.image-container {
+  position: relative;
+  min-height: 400px;
+  max-height: 660px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 16px;
+  transition: all 0.3s ease;
+}
+
+/* 信息面板优化 */
+.ant-card[title='图片信息'] {
+  border-radius: 12px !important;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06) !important;
+
+  :deep(.ant-card-head) {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 16px 24px;
+    font-size: 18px;
+    color: #2d3748;
+  }
+
+  :deep(.ant-card-body) {
+    padding: 24px !important;
+  }
+}
+
+/* 标签容器样式 */
+.info-descriptions :deep(.ant-descriptions-item-content) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 0;
+  flex: 1;
+  font-size: 14px;
+}
+
+.info-descriptions :deep(.ant-descriptions-item-container) {
+  display: flex;
+}
+
+.info-descriptions :deep(.ant-descriptions-item-label) {
+  width: 60px;
+  font-size: 13px;
+  color: #666;
+  flex-shrink: 0;
+}
+
+.info-descriptions :deep(.ant-descriptions-item-label) {
+  padding: 4px;
+}
+
+/* 按钮基础样式 */
+.custom-actions {
+  display: flex;
+  padding: 4px 0;
+}
+
+.custom-actions :deep(.ant-space) {
+  width: 100%;
+  gap: 8px !important;
+  justify-content: flex-start;
+}
+
+.custom-actions :deep(.action-btn.ant-btn) {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none !important;
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: white !important;
+}
+
+/* 下载按钮 - 蓝紫渐变 */
+.custom-actions :deep(.download-btn.ant-btn-primary) {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
+}
+
+/* 分享按钮 - 蓝橙渐变 */
+.custom-actions :deep(.share-btn.ant-btn-primary) {
+  background: linear-gradient(135deg, #0ea5e9, #f59e0b) !important;
+  box-shadow: 0 4px 15px rgba(14, 165, 233, 0.35);
+}
+
+/* 编辑按钮 - 绿色渐变 */
+.custom-actions :deep(.edit-btn.ant-btn-primary) {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
+}
+
+/* 删除按钮 - 红色渐变 */
+.custom-actions :deep(.delete-btn.ant-btn-primary) {
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);
+}
+
+/* 图标样式 */
+.custom-actions :deep(.action-btn .anticon) {
+  font-size: 18px;
+  color: white !important;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  transition: all 0.3s ease;
+}
+
+/* 按钮悬停效果 */
+.custom-actions :deep(.action-btn:hover) {
+  transform: translateY(-2px);
+  filter: brightness(1.1) saturate(1.1);
+}
+
+.custom-actions :deep(.action-btn:hover .anticon) {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
+}
+
+/* 点击效果 */
+.custom-actions :deep(.action-btn:active) {
+  transform: scale(0.95);
+  filter: brightness(0.95);
+}
+
+/* 按钮发光效果 */
+.custom-actions :deep(.action-btn)::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shine 2s infinite;
+}
+</style>

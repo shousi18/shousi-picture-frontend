@@ -72,7 +72,9 @@
         <RouterLink to="/user/login">去登录</RouterLink>
       </div>
       <a-form-item>
-        <a-button type="primary" html-type="submit" style="width: 100%">注册</a-button>
+        <a-button class="register-button" type="primary" html-type="submit" style="width: 100%"
+          >注册
+        </a-button>
       </a-form-item>
     </a-form>
   </div>
@@ -221,12 +223,14 @@ onBeforeUnmount(() => {
 <style scoped>
 #userRegisterPage {
   max-width: 360px;
-  margin: 0 auto;
+  margin: 60px auto;
 }
 
 .title {
   text-align: center;
   margin-bottom: 16px;
+  font-size: 24px;
+  font-weight: bold;
 }
 
 .desc {
@@ -246,5 +250,26 @@ onBeforeUnmount(() => {
   display: flex;
   gap: 12px;
   align-items: center;
+}
+
+.register-button {
+  width: 100%;
+  height: 36px;
+  border-radius: 12px;
+  background: linear-gradient(to right, #f6d365 0%, #fda085 100%);
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: linear-gradient(to right, #f6d365 0%, #fda085 100%);
+  }
+
+  &:active {
+    background: linear-gradient(to right, #f6d365 0%, #fda085 100%);
+  }
 }
 </style>

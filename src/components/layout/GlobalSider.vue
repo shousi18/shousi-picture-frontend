@@ -132,6 +132,7 @@ router.afterEach((to, from, next) => {
 #globalHeader .title-bar {
   display: flex;
   align-items: center;
+  box-shadow: 4px 0 16px rgba(0, 0, 0, 0.06);
 }
 
 #globalSider :deep(.ant-layout-sider) {
@@ -143,5 +144,83 @@ router.afterEach((to, from, next) => {
   transition: all 0.3s cubic-bezier(0.2, 0, 0, 1) 0s;
   overflow: hidden;
   height: 100%;
+}
+
+/* 悬停状态 */
+:deep(.ant-menu-item:hover),
+:deep(.ant-menu-submenu-title:hover) {
+  background: rgba(99, 102, 241, 0.05) !important;
+
+  .anticon {
+    color: #6366f1;
+    transform: scale(1.1);
+    filter: drop-shadow(0 2px 4px rgba(99, 102, 241, 0.1));
+  }
+}
+
+/* 文字样式 */
+:deep(.ant-menu-title-content) {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  color: #2d3748;
+  letter-spacing: 0.3px;
+}
+
+/* 菜单项基础样式 */
+:deep(.ant-menu-item),
+:deep(.ant-menu-submenu-title) {
+  height: 48px !important;
+  line-height: 48px !important;
+  margin: 4px 12px !important;
+  border-radius: 8px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* 图标样式 */
+:deep(.ant-menu-item .anticon),
+:deep(.ant-menu-submenu-title .anticon) {
+  font-size: 18px !important;
+  color: #64748b;
+  transition: all 0.3s ease;
+}
+
+/* 选中状态 */
+:deep(.ant-menu-item-selected) {
+  background: rgba(99, 102, 241, 0.1) !important;
+
+  .anticon {
+    color: #6366f1;
+    filter: drop-shadow(0 2px 4px rgba(99, 102, 241, 0.2));
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 24px;
+    background: #6366f1;
+    border-radius: 2px;
+  }
+}
+
+/* 折叠状态样式 */
+:deep(.ant-layout-sider-collapsed) {
+  .ant-menu-title-content {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .ant-menu-item,
+  .ant-menu-submenu-title {
+    justify-content: center;
+  }
+
+  .anticon {
+    margin-right: 0 !important;
+    transform: scale(1.2);
+  }
 }
 </style>

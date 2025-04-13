@@ -6,10 +6,12 @@ import checkAccess from './checkAccess'
 router.beforeEach(async (to, from, next) => {
   const loginUserStore = useLoginUserStore()
   let loginUser = loginUserStore.loginUser
+
+  const WHITE_LIST = ['/user/login', '/user/register']
   // 如果之前没有尝试获取过用户登录信息，才自动登录
-  if (!loginUser || !loginUser.userRole) {
-    await loginUserStore.fetchLoginUser();
-    loginUser = loginUserStore.loginUser;
+  if (!WHITE_LIST.includes(to.path) && (!loginUser || !loginUser.userRole)) {
+    await loginUserStore.fetchLoginUser()
+    loginUser = loginUserStore.loginUser
   }
   const needAccess = (to.meta?.access as string) ?? ACCESS_ENUM.NOT_LOGIN
   // 要跳转的页面必须要登陆

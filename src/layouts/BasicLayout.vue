@@ -37,14 +37,19 @@ import GlobalSider from '@/components/layout/GlobalSider.vue'
 
 #basicLayout .sider {
   background: #fff;
-  padding-top: 20px;
+  padding-top: 5px;
   border-right: 0.5px solid #eee;
+}
+
+#basicLayout :deep(.ant-menu-root) {
+  border-bottom: none !important;
+  border-inline-end: none !important;
 }
 
 #basicLayout .content {
   padding: 28px;
-  background: linear-gradient(to right, #ffffff, #efefef);
-  margin-bottom: 30px;
+  background: #fff;
+  margin-bottom: 28px;
 }
 
 #basicLayout .footer {
@@ -55,10 +60,5 @@ import GlobalSider from '@/components/layout/GlobalSider.vue'
   left: 0;
   right: 0;
   text-align: center;
-}
-
-#basicLayout :deep(.ant-menu-root) {
-  border-bottom: none !important;
-  border-inline-end: none !important;
 }
 </style>
