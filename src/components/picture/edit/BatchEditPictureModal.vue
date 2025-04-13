@@ -14,11 +14,19 @@
       <a-form-item label="标签" name="tagIds">
         <a-select
           v-model:value="formData.tagIds"
-          :options="tagOptions"
-          mode="tags"
-          placeholder="请输入标签"
-          allowClear
-        />
+          mode="multiple"
+          placeholder="至少选择一个标签"
+          allow-clear
+        >
+          <a-select-option
+            v-for="tag in tagOptions"
+            :key="tag.id"
+            :value="tag.id"
+            :disabled="formData?.tagIds?.length >= 5 && !formData?.tagIds?.includes(tag.id)"
+          >
+            {{ tag.label }}
+          </a-select-option>
+        </a-select>
       </a-form-item>
       <a-form-item label="命名规则" name="nameRule">
         <a-input
@@ -36,8 +44,8 @@
 <script setup lang="ts">
 import { defineProps, ref, withDefaults, defineExpose, reactive, onMounted } from 'vue'
 import { message } from 'ant-design-vue'
-import { listHotTagsUsingGet } from '@/api/tagController.ts'
-import { listHotCategoriesUsingGet } from '@/api/categoryController.ts'
+import { listHotTagsUsingGet, listTagsUsingGet } from '@/api/tagController.ts'
+import { listCategoriesUsingGet, listHotCategoriesUsingGet } from '@/api/categoryController.ts'
 import { editPictureByBatchUsingPost } from '@/api/pictureController.ts'
 
 // 定义组件属性类型
@@ -81,8 +89,8 @@ defineExpose({
 const getTagCategoryOptions = async () => {
   try {
     const [tagRes, categoryRes] = await Promise.all([
-      listHotTagsUsingGet(),
-      listHotCategoriesUsingGet(),
+      listTagsUsingGet(),
+      listCategoriesUsingGet(),
     ])
 
     if (tagRes.data.code === 0 && tagRes.data.data) {

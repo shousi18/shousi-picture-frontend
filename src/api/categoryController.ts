@@ -17,6 +17,14 @@ export async function addCategoryUsingPost(
   })
 }
 
+/** listCategories GET /api/category/list */
+export async function listCategoriesUsingGet(options?: { [key: string]: any }) {
+  return request<API.BaseResponseListCategoryVO_>('/api/category/list', {
+    method: 'GET',
+    ...(options || {}),
+  })
+}
+
 /** listHotCategories GET /api/category/list/hot */
 export async function listHotCategoriesUsingGet(options?: { [key: string]: any }) {
   return request<API.BaseResponseListCategoryVO_>('/api/category/list/hot', {

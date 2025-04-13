@@ -14,6 +14,14 @@ export async function addTagUsingPost(body: API.TagAddRequest, options?: { [key:
   })
 }
 
+/** listTags GET /api/tag/list */
+export async function listTagsUsingGet(options?: { [key: string]: any }) {
+  return request<API.BaseResponseListTagVO_>('/api/tag/list', {
+    method: 'GET',
+    ...(options || {}),
+  })
+}
+
 /** listHotTags GET /api/tag/list/hot */
 export async function listHotTagsUsingGet(options?: { [key: string]: any }) {
   return request<API.BaseResponseListTagVO_>('/api/tag/list/hot', {

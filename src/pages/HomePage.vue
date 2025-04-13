@@ -36,7 +36,7 @@
       </a-tabs>
     </div>
     <div class="tag-bar">
-      <span class="tag-bar-label">标签：</span>
+      <span class="tag-bar-label">热门标签：</span>
       <a-space :size="[0, 8]" wrap>
         <a-checkable-tag
           v-for="(tag, index) in tagList"

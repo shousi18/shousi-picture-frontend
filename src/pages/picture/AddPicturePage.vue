@@ -64,8 +64,16 @@
           mode="multiple"
           placeholder="至少选择一个标签"
           allow-clear
-          :options="tagOptions"
-        />
+        >
+          <a-select-option
+            v-for="tag in tagOptions"
+            :key="tag.id"
+            :value="tag.id"
+            :disabled="pictureForm?.tagIds?.length >= 5 && !pictureForm?.tagIds?.includes(tag.id)"
+          >
+            {{ tag.label }}
+          </a-select-option>
+        </a-select>
       </a-form-item>
       <a-form-item>
         <a-button type="primary" html-type="submit" style="width: 100%">
@@ -82,8 +90,8 @@ import { computed, h, nextTick, onMounted, reactive, ref, watchEffect } from 'vu
 import { editPictureUsingPost, getPictureVoByIdUsingGet } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
 import { useRoute, useRouter } from 'vue-router'
-import { listHotCategoriesUsingGet } from '@/api/categoryController.ts'
-import { listHotTagsUsingGet } from '@/api/tagController.ts'
+import { listCategoriesUsingGet, listHotCategoriesUsingGet } from '@/api/categoryController.ts'
+import { listHotTagsUsingGet, listTagsUsingGet } from '@/api/tagController.ts'
 import UrlPictureUpload from '@/components/picture/upload/UrlPictureUpload.vue'
 import { EditOutlined, FullscreenOutlined } from '@ant-design/icons-vue'
 import ImageCropper from '@/components/picture/edit/ImageCropper.vue'
@@ -147,7 +155,6 @@ const onImageOutPaintingSuccess = (newPicture: API.PictureVO) => {
   picture.value = newPicture
 }
 
-
 // 图片编辑弹窗容器引用
 const imageCropperRef = ref()
 
@@ -210,10 +217,7 @@ const handleSubmit = async (values: API.PictureEditRequest) => {
  */
 const getTagCategoryOptions = async () => {
   try {
-    const [tagRes, categoryRes] = await Promise.all([
-      listHotTagsUsingGet(),
-      listHotCategoriesUsingGet(),
-    ])
+    const [tagRes, categoryRes] = await Promise.all([listTagsUsingGet(), listCategoriesUsingGet()])
 
     if (tagRes.data.code === 0 && tagRes.data.data) {
       tagOptions.value = tagRes.data.data.map((tag) => ({

@@ -275,7 +275,6 @@ declare namespace API {
 
   type HandleInvitationRequest = {
     id?: number
-    spaceId?: number
     status?: number
   }
 
