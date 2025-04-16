@@ -32,16 +32,11 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
-import {
-  listPictureVoByPageUsingPost,
-  searchPictureByColorUsingPost,
-} from '@/api/pictureController.ts'
+import { listPictureVoByPage, searchPictureByColor } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
-import { getSpaceVoByIdUsingGet } from '@/api/spaceController.ts'
 import PictureList from '@/components/picture/PictureList.vue'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
 import PictureSearchForm from '@/components/picture/PictureSearchForm.vue'
-import { ColorPicker } from 'vue3-colorpicker'
 import 'vue3-colorpicker/style.css'
 import BatchEditPictureModal from '@/components/picture/edit/BatchEditPictureModal.vue'
 import { SPACE_PERMISSION_ENUM } from '../../constant/space.ts'
@@ -66,7 +61,7 @@ const batchEditPictureModalRef = ref()
  * @param color
  */
 const onColorChange = async (color: string) => {
-  const res = await searchPictureByColorUsingPost({
+  const res = await searchPictureByColor({
     picColor: color,
   })
   if (res.data.code === 0 && res.data.data) {
@@ -101,7 +96,6 @@ function createPermissionChecker(permission: string) {
 const canEditPicture = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_EDIT)
 const canDeletePicture = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_DELETE)
 
-
 /**
  * 获取数据
  */
@@ -119,7 +113,7 @@ const fetchData = async () => {
     userId: loginUser.value.id,
     ...searchParams.value,
   }
-  const res = await listPictureVoByPageUsingPost(params)
+  const res = await listPictureVoByPage(params)
   if (res.data.code === 0 && res.data.data) {
     dataList.value = res.data.data.records ?? []
     total.value = res.data.data.total ?? 0

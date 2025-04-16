@@ -29,7 +29,7 @@ import { ref } from 'vue'
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import type { UploadProps } from 'ant-design-vue'
 import { message } from 'ant-design-vue'
-import { uploadPictureByUrlUsingPost, uploadPictureUsingPost } from '@/api/pictureController.ts'
+import { uploadPictureByUrl, uploadPicture } from '@/api/pictureController.ts'
 import { CloudUploadOutlined } from '@ant-design/icons-vue'
 interface Props {
   picture?: API.PictureVO
@@ -60,7 +60,7 @@ const handleUpload = async ({ file }: any) => {
       params.id = props.picture.id
     }
     params.spaceId = props.spaceId
-    const res = await uploadPictureByUrlUsingPost(params)
+    const res = await uploadPictureByUrl(params)
     if (res.data.code === 0 && res.data.data) {
       message.success('图片上传成功')
       // 将上传成功的图片信息传递给父组件

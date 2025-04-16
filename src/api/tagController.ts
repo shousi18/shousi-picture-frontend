@@ -2,9 +2,9 @@
 /* eslint-disable */
 import request from '@/request'
 
-/** addTag POST /api/tag/add */
-export async function addTagUsingPost(body: API.TagAddRequest, options?: { [key: string]: any }) {
-  return request<API.BaseResponseLong_>('/api/tag/add', {
+/** 此处后端没有提供注释 POST /tag/add */
+export async function addTag(body: API.TagAddRequest, options?: { [key: string]: any }) {
+  return request<API.BaseResponseLong>('/tag/add', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -14,17 +14,17 @@ export async function addTagUsingPost(body: API.TagAddRequest, options?: { [key:
   })
 }
 
-/** listTags GET /api/tag/list */
-export async function listTagsUsingGet(options?: { [key: string]: any }) {
-  return request<API.BaseResponseListTagVO_>('/api/tag/list', {
+/** 此处后端没有提供注释 GET /tag/list */
+export async function listTags(options?: { [key: string]: any }) {
+  return request<API.BaseResponseListTagVO>('/tag/list', {
     method: 'GET',
     ...(options || {}),
   })
 }
 
-/** listHotTags GET /api/tag/list/hot */
-export async function listHotTagsUsingGet(options?: { [key: string]: any }) {
-  return request<API.BaseResponseListTagVO_>('/api/tag/list/hot', {
+/** 此处后端没有提供注释 GET /tag/list/hot */
+export async function listHotTags(options?: { [key: string]: any }) {
+  return request<API.BaseResponseListTagVO>('/tag/list/hot', {
     method: 'GET',
     ...(options || {}),
   })

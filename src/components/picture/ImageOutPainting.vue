@@ -29,10 +29,10 @@
 <script setup lang="ts">
 import { onUnmounted, ref } from 'vue'
 import {
-  createPictureOutPaintingTaskUsingPost,
-  getPictureOutPaintingTaskUsingGet,
-  uploadPictureByUrlUsingPost,
-  uploadPictureUsingPost,
+  createPictureOutPaintingTask,
+  getPictureOutPaintingTask,
+  uploadPictureByUrl,
+  uploadPicture,
 } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
 
@@ -50,7 +50,7 @@ const createTask = async () => {
   if (!props.picture?.id) {
     return
   }
-  const res = await createPictureOutPaintingTaskUsingPost({
+  const res = await createPictureOutPaintingTask({
     pictureId: props.picture?.id,
     // 根据需要设置的扩图参数
     parameters: {
@@ -80,7 +80,7 @@ const startPolling = () => {
   }
   try {
     pollingTimer = setInterval(async () => {
-      const res = await getPictureOutPaintingTaskUsingGet({ taskId: taskId.value })
+      const res = await getPictureOutPaintingTask({ taskId: taskId.value })
       if (res.data.code === 0 && res.data.data) {
         const taskResult = res.data.data.output
         if (taskResult?.taskStatus === 'SUCCEEDED') {
@@ -130,7 +130,7 @@ const handleUpload = async () => {
     if (props.picture?.id) {
       params.id = props.picture.id
     }
-    const res = await uploadPictureByUrlUsingPost(params)
+    const res = await uploadPictureByUrl(params)
     if (res.data.code === 0 && res.data.data) {
       message.success('图片上传成功')
       // 将上传成功的图片信息传递给父组件

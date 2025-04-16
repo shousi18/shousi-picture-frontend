@@ -45,13 +45,8 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { message } from 'ant-design-vue'
-import { PlusOutlined } from '@ant-design/icons-vue'
-import AvatarCropper from '@/components/user/AvatarCropper.vue'
-import {
-  updateUserAvatarUsingPost,
-  updateUserPasswordUsingPost,
-  updateUserUsingPost,
-} from '@/api/userController.ts'
+
+import { updateUserPassword } from '@/api/userController.ts'
 
 interface Props {
   userInfo: API.UserVO
@@ -82,7 +77,7 @@ const handleSubmit = async () => {
       id: props.userInfo.id,
       ...formSates,
     }
-    const res = await updateUserPasswordUsingPost(params)
+    const res = await updateUserPassword(params)
     if (res.data.code === 0) {
       props?.onSuccess?.(props.userInfo)
       message.success('密码修改成功')

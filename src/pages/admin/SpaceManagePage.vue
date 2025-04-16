@@ -99,16 +99,16 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { message } from 'ant-design-vue'
 import dayjs from 'dayjs'
 import {
-  deletePictureUsingPost,
-  listPictureByPageUsingPost,
-  pictureReviewUsingPost,
+  deletePicture,
+  listPictureByPage,
+  pictureReview,
 } from '@/api/pictureController.ts'
 import {
   PIC_REVIEW_STATUS_ENUM,
   PIC_REVIEW_STATUS_MAP,
   PIC_REVIEW_STATUS_OPTIONS,
 } from '../../constant/picture.ts'
-import { deleteSpaceUsingPost, listSpaceByPageUsingPost } from '@/api/spaceController.ts'
+import { deleteSpace, listSpaceByPage } from '@/api/spaceController.ts'
 import { SPACE_LEVEL_MAP, SPACE_LEVEL_OPTIONS, SPACE_TYPE_MAP, SPACE_TYPE_OPTIONS } from '../../constant/space.ts'
 import { formatFileSize } from '../../utils'
 
@@ -178,7 +178,7 @@ const pagination = computed(() => {
 
 // 获取数据
 const fetchData = async () => {
-  const res = await listSpaceByPageUsingPost({
+  const res = await listSpaceByPage({
     ...searchParams,
   })
   if (res.data.data) {
@@ -213,7 +213,7 @@ const doDelete = async (id: number) => {
     message.error('id 为空')
     return
   }
-  const deleteResponse = await deleteSpaceUsingPost({ id })
+  const deleteResponse = await deleteSpace({ id })
   if (deleteResponse.data.data && deleteResponse.data.code === 0) {
     await fetchData()
     message.success('删除成功')

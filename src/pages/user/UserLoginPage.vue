@@ -61,7 +61,7 @@
 </template>
 <script lang="ts" setup>
 import { h, onMounted, reactive, ref } from 'vue'
-import { getCaptchaUsingGet, userLoginUsingPost } from '@/api/userController.ts'
+import { getCaptcha, userLogin } from '@/api/userController.ts'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
 import { message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
@@ -95,7 +95,7 @@ const handleSubmit = async (values: any) => {
   }
   // 获取图形码id
   values.verifyCodeId = formState.verifyCodeId
-  const res = await userLoginUsingPost(values)
+  const res = await userLogin(values)
   // 登录成功，把登录态保存到全局状态中
   if (res.data.code === 0 && res.data.data) {
     await loginUserStore.fetchLoginUser()
@@ -113,7 +113,7 @@ const handleSubmit = async (values: any) => {
  * 获得验证码
  */
 const getVerifyCode = async () => {
-  const res = await getCaptchaUsingGet()
+  const res = await getCaptcha()
   if (res.data.code === 0 && res.data.data) {
     verifyCodeImg.value = 'data:image/jpeg;base64,' + res.data.data.base64Captcha
     formState.verifyCodeId = res.data.data.encryptedCaptcha

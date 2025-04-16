@@ -142,9 +142,9 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { message } from 'ant-design-vue'
 import dayjs from 'dayjs'
 import {
-  deletePictureUsingPost,
-  listPictureByPageUsingPost,
-  pictureReviewUsingPost,
+  deletePicture,
+  listPictureByPage,
+  pictureReview,
 } from '@/api/pictureController.ts'
 import {
   PIC_REVIEW_STATUS_ENUM,
@@ -233,7 +233,7 @@ const pagination = computed(() => {
 
 // 获取数据
 const fetchData = async () => {
-  const res = await listPictureByPageUsingPost({
+  const res = await listPictureByPage({
     ...searchParams,
     nullSpaceId: true,
   })
@@ -269,7 +269,7 @@ const doDelete = async (id: number) => {
     message.error('id 为空')
     return
   }
-  const deleteResponse = await deletePictureUsingPost({ id })
+  const deleteResponse = await deletePicture({ id })
   if (deleteResponse.data.data && deleteResponse.data.code === 0) {
     await fetchData()
     message.success('删除成功')
@@ -289,7 +289,7 @@ const handleReview = async (record: API.Picture, reviewStatus: number) => {
     showModal.value = true
     return
   }
-  const res = await pictureReviewUsingPost({
+  const res = await pictureReview({
     id: record.id,
     reviewStatus,
     reviewMessage: '管理员操作通过',
@@ -314,7 +314,7 @@ const handleReject = async () => {
     return
   }
   try {
-    const res = await pictureReviewUsingPost({
+    const res = await pictureReview({
       id: currentRecord.value.id,
       reviewStatus: PIC_REVIEW_STATUS_ENUM.REJECT,
       reviewMessage: rejectReason.value,

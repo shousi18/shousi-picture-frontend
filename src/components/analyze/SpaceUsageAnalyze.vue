@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import { ref, watchEffect } from 'vue'
-import { getSpaceUsageAnalyzeUsingPost } from '@/api/spaceAnalyzeController.ts'
+import { getSpaceUsageAnalyze } from '@/api/spaceAnalyzeController.ts'
 import { message } from 'ant-design-vue'
 import { formatFileSize } from '@/utils'
 
@@ -42,7 +42,7 @@ const loading = ref<boolean>(false)
 
 const fetchData = async () => {
   loading.value = true
-  const res = await getSpaceUsageAnalyzeUsingPost({
+  const res = await getSpaceUsageAnalyze({
     queryAll: props.queryAll,
     queryPublic: props.queryPublic,
     spaceId: props.spaceId,

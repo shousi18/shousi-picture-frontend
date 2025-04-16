@@ -53,7 +53,7 @@ import SpaceRankAnalyze from '@/components/analyze/SpaceRankAnalyze.vue'
 import { useRoute } from 'vue-router'
 import { computed, onMounted, ref, watchEffect } from 'vue'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
-import { getSpaceVoByIdUsingGet } from '@/api/spaceController.ts'
+import { getSpaceVoById } from '@/api/spaceController.ts'
 
 const route = useRoute()
 
@@ -92,7 +92,7 @@ const getSpaceVO = async () => {
   if (!spaceId.value) {
     return
   }
-  const res = await getSpaceVoByIdUsingGet({ id: spaceId.value })
+  const res = await getSpaceVoById({ id: spaceId.value })
   if (res.data.code === 0 && res.data.data) {
     space.value = res.data.data
   }

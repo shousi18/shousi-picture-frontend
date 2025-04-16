@@ -43,7 +43,7 @@
 
 <script lang="ts" setup>
 import { computed, onUnmounted, ref, watchEffect } from 'vue'
-import { clearEditHistoryUsingPost, uploadPictureUsingPost } from '@/api/pictureController.ts'
+import { clearEditHistory, uploadPicture } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
 import PictureEditWebSocket from '@/utils/pictureEditWebSocket.ts'
@@ -112,7 +112,7 @@ const handleUpload = async ({ file }: any) => {
   try {
     const params: API.PictureUploadRequest = props.picture ? { id: props.picture.id } : {}
     params.spaceId = props.spaceId
-    const res = await uploadPictureUsingPost(params, {}, file, {})
+    const res = await uploadPicture(params, {}, file, {})
     if (res.data.code === 0 && res.data.data) {
       message.success('图片上传成功')
       // 将上传成功的图片信息传递给父组件
@@ -152,7 +152,7 @@ const clearHistory = async () => {
     spaceId: props.spaceId
   }
   // 清除历史操作
-  await clearEditHistoryUsingPost(params)
+  await clearEditHistory(params)
 }
 
 // 暴露函数给父组件

@@ -87,16 +87,16 @@
 <script setup lang="ts">
 import PictureUpload from '@/components/picture/upload/PictureUpload.vue'
 import { computed, h, nextTick, onMounted, reactive, ref, watchEffect } from 'vue'
-import { editPictureUsingPost, getPictureVoByIdUsingGet } from '@/api/pictureController.ts'
+import { editPicture, getPictureVoById } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
 import { useRoute, useRouter } from 'vue-router'
-import { listCategoriesUsingGet, listHotCategoriesUsingGet } from '@/api/categoryController.ts'
-import { listHotTagsUsingGet, listTagsUsingGet } from '@/api/tagController.ts'
+import { listCategories, listHotCategories } from '@/api/categoryController.ts'
+import { listHotTags, listTags } from '@/api/tagController.ts'
 import UrlPictureUpload from '@/components/picture/upload/UrlPictureUpload.vue'
 import { EditOutlined, FullscreenOutlined } from '@ant-design/icons-vue'
 import ImageCropper from '@/components/picture/edit/ImageCropper.vue'
 import ImageOutPainting from '@/components/picture/ImageOutPainting.vue'
-import { getSpaceVoByIdUsingGet } from '@/api/spaceController.ts'
+import { getSpaceVoById } from '@/api/spaceController.ts'
 
 const picture = ref<API.PictureVO>()
 const categoryOptions = ref<any>([])
@@ -122,7 +122,7 @@ const space = ref<API.SpaceVO>()
 const fetchSpace = async () => {
   // 获取数据
   if (spaceId.value) {
-    const res = await getSpaceVoByIdUsingGet({
+    const res = await getSpaceVoById({
       id: spaceId.value,
     })
     if (res.data.code === 0 && res.data.data) {
@@ -193,7 +193,7 @@ const handleSubmit = async (values: API.PictureEditRequest) => {
   if (!pictureId) {
     return
   }
-  const res = await editPictureUsingPost({
+  const res = await editPicture({
     id: pictureId,
     spaceId: spaceId.value,
     ...values,
@@ -217,7 +217,7 @@ const handleSubmit = async (values: API.PictureEditRequest) => {
  */
 const getTagCategoryOptions = async () => {
   try {
-    const [tagRes, categoryRes] = await Promise.all([listTagsUsingGet(), listCategoriesUsingGet()])
+    const [tagRes, categoryRes] = await Promise.all([listTags(), listCategories()])
 
     if (tagRes.data.code === 0 && tagRes.data.data) {
       tagOptions.value = tagRes.data.data.map((tag) => ({
@@ -246,7 +246,7 @@ const getOldPicture = async () => {
   const id = route.query?.id
   if (!id) return
   try {
-    const res = await getPictureVoByIdUsingGet({ id })
+    const res = await getPictureVoById({ id })
     if (res.data.code === 0 && res.data.data) {
       const data = res.data.data
       picture.value = data

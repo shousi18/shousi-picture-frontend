@@ -74,7 +74,7 @@ import { UploadOutlined, LogoutOutlined, UserOutlined, SettingOutlined, MessageO
 import { MenuProps, message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
-import { userLogoutUsingPost } from '@/api/userController.ts'
+import { userLogout } from '@/api/userController.ts'
 import { routes } from '@/router/routes.ts'
 import checkAccess from '@/access/checkAccess.ts'
 
@@ -122,7 +122,7 @@ const doMenuClick = ({ key }: any) => {
 
 // 用户注销
 const doLogout = async () => {
-  const res = await userLogoutUsingPost()
+  const res = await userLogout()
   console.log(res)
   if (res.data.code === 0) {
     loginUserStore.setLoginUser({

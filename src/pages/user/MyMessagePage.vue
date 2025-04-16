@@ -9,14 +9,14 @@
             <a-space>
               <a-button
                 type="primary"
-                @click="handleInvitation(item, SPACE_USER_STATUS_ENUM.AGREE)"
+                @click="handleInvitationSubmit(item, SPACE_USER_STATUS_ENUM.AGREE)"
                 :loading="handleLoading"
               >
                 同意
               </a-button>
               <a-button
                 danger
-                @click="handleInvitation(item, SPACE_USER_STATUS_ENUM.REJECT)"
+                @click="handleInvitationSubmit(item, SPACE_USER_STATUS_ENUM.REJECT)"
                 :loading="handleLoading"
               >
                 拒绝
@@ -48,8 +48,7 @@ import { ref, onMounted } from 'vue'
 import { message } from 'ant-design-vue'
 import dayjs from 'dayjs'
 import {
-  getPendingInvitationsUsingGet,
-  handleInvitationUsingPost,
+  getPendingInvitations, handleInvitation
 } from '@/api/spaceUserController.ts'
 import { SPACE_TYPE_ENUM, SPACE_USER_STATUS_ENUM } from '@/constant/space.ts'
 
@@ -63,7 +62,7 @@ const formatTime = (time: string) => {
 const loadData = async () => {
   try {
     loading.value = true
-    const res = await getPendingInvitationsUsingGet()
+    const res = await getPendingInvitations()
     if (res.data.data && res.data.code === 0) {
       invitations.value = res.data.data
     }
@@ -75,10 +74,10 @@ const loadData = async () => {
 }
 
 const handleLoading = ref<boolean>(false)
-const handleInvitation = async (item: API.SpaceUserVO, status: number) => {
+const handleInvitationSubmit = async (item: API.SpaceUserVO, status: number) => {
   try {
     handleLoading.value = true
-    const res = await handleInvitationUsingPost({
+    const res = await handleInvitation({
       id: item.id,
       status: status,
     })

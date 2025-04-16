@@ -10,7 +10,7 @@
 import VChart from 'vue-echarts'
 import 'echarts'
 import { computed, ref, watchEffect } from 'vue'
-import { getSpaceCategoryAnalyzeUsingPost } from '@/api/spaceAnalyzeController.ts'
+import { getSpaceCategoryAnalyze } from '@/api/spaceAnalyzeController.ts'
 import { message } from 'ant-design-vue'
 
 interface Props {
@@ -29,7 +29,7 @@ const loading = ref<boolean>(false)
 
 const fetchData = async () => {
   loading.value = true
-  const res = await getSpaceCategoryAnalyzeUsingPost({
+  const res = await getSpaceCategoryAnalyze({
     queryAll: props.queryAll,
     queryPublic: props.queryPublic,
     spaceId: props.spaceId,

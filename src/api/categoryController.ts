@@ -2,12 +2,9 @@
 /* eslint-disable */
 import request from '@/request'
 
-/** addCategory POST /api/category/add */
-export async function addCategoryUsingPost(
-  body: API.CategoryAddRequest,
-  options?: { [key: string]: any }
-) {
-  return request<API.BaseResponseLong_>('/api/category/add', {
+/** 此处后端没有提供注释 POST /category/add */
+export async function addCategory(body: API.CategoryAddRequest, options?: { [key: string]: any }) {
+  return request<API.BaseResponseLong>('/category/add', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -17,17 +14,17 @@ export async function addCategoryUsingPost(
   })
 }
 
-/** listCategories GET /api/category/list */
-export async function listCategoriesUsingGet(options?: { [key: string]: any }) {
-  return request<API.BaseResponseListCategoryVO_>('/api/category/list', {
+/** 此处后端没有提供注释 GET /category/list */
+export async function listCategories(options?: { [key: string]: any }) {
+  return request<API.BaseResponseListCategoryVO>('/category/list', {
     method: 'GET',
     ...(options || {}),
   })
 }
 
-/** listHotCategories GET /api/category/list/hot */
-export async function listHotCategoriesUsingGet(options?: { [key: string]: any }) {
-  return request<API.BaseResponseListCategoryVO_>('/api/category/list/hot', {
+/** 此处后端没有提供注释 GET /category/list/hot */
+export async function listHotCategories(options?: { [key: string]: any }) {
+  return request<API.BaseResponseListCategoryVO>('/category/list/hot', {
     method: 'GET',
     ...(options || {}),
   })

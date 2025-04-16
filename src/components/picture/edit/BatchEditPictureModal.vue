@@ -44,9 +44,9 @@
 <script setup lang="ts">
 import { defineProps, ref, withDefaults, defineExpose, reactive, onMounted } from 'vue'
 import { message } from 'ant-design-vue'
-import { listHotTagsUsingGet, listTagsUsingGet } from '@/api/tagController.ts'
-import { listCategoriesUsingGet, listHotCategoriesUsingGet } from '@/api/categoryController.ts'
-import { editPictureByBatchUsingPost } from '@/api/pictureController.ts'
+import { listHotTags, listTags } from '@/api/tagController.ts'
+import { listCategories, listHotCategories } from '@/api/categoryController.ts'
+import { editPictureByBatch } from '@/api/pictureController.ts'
 
 // 定义组件属性类型
 interface Props {
@@ -89,8 +89,8 @@ defineExpose({
 const getTagCategoryOptions = async () => {
   try {
     const [tagRes, categoryRes] = await Promise.all([
-      listTagsUsingGet(),
-      listCategoriesUsingGet(),
+      listTags(),
+      listCategories(),
     ])
 
     if (tagRes.data.code === 0 && tagRes.data.data) {
@@ -120,7 +120,7 @@ const handleSubmit = async (values: any) => {
   if (!props.pictureList) {
     return
   }
-  const res = await editPictureByBatchUsingPost({
+  const res = await editPictureByBatch({
     pictureIdList: props.pictureList.map((picture) => picture.id),
     spaceId: props.spaceId,
     ...values,

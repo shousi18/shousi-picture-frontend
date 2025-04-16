@@ -140,9 +140,9 @@
 <script setup lang="ts">
 import { computed, h, onMounted, ref } from 'vue'
 import {
-  deletePictureUsingPost,
-  getPictureVoByIdUsingGet,
-  pictureReviewUsingPost,
+  deletePicture,
+  getPictureVoById,
+  pictureReview,
 } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
@@ -190,7 +190,7 @@ const canDelete = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_DELETE)
  * 获取图片详细
  */
 const fetchPictureDetail = async () => {
-  const res = await getPictureVoByIdUsingGet({ id: props.id })
+  const res = await getPictureVoById({ id: props.id })
   if (res.data.code === 0 && res.data.data) {
     picture.value = res.data.data
     message.success('获取图片数据成功')
@@ -242,7 +242,7 @@ const doEdit = () => {
  */
 const doDelete = () => {
   if (picture.value?.id) {
-    deletePictureUsingPost({ id: picture.value?.id }).then((res) => {
+    deletePicture({ id: picture.value?.id }).then((res) => {
       if (res.data.code === 0) {
         message.success('删除成功')
         router.push({
@@ -266,7 +266,7 @@ const handleReview = async (record: API.PictureVO, reviewStatus: number) => {
     showModal.value = true
     return
   }
-  const res = await pictureReviewUsingPost({
+  const res = await pictureReview({
     id: record.id,
     reviewStatus,
     reviewMessage: '管理员操作通过',
@@ -291,7 +291,7 @@ const handleReject = async () => {
     return
   }
   try {
-    const res = await pictureReviewUsingPost({
+    const res = await pictureReview({
       id: currentRecord.value.id,
       reviewStatus: PIC_REVIEW_STATUS_ENUM.REJECT,
       reviewMessage: rejectReason.value,

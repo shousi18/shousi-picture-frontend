@@ -54,7 +54,7 @@ import { ref } from 'vue'
 import { message } from 'ant-design-vue'
 import { PlusOutlined } from '@ant-design/icons-vue'
 import AvatarCropper from '@/components/userinfo/AvatarCropper.vue'
-import { updateUserAvatarUsingPost, updateUserUsingPost } from '@/api/userController.ts'
+import { updateUserAvatar, updateUser } from '@/api/userController.ts'
 
 interface Props {
   userInfo: API.UserVO
@@ -83,7 +83,7 @@ const handleAvatarUpload = (e: Event) => {
 
 const handleCropperAvatar = async (file: File) => {
   try {
-    const res = await updateUserAvatarUsingPost({ id: props.userInfo.id }, {}, file)
+    const res = await updateUserAvatar({ id: props.userInfo.id }, {}, file)
     if (res.data.code === 0) {
       message.success('头像更新成功')
       props.userInfo.userAvatar = res.data.data
@@ -106,7 +106,7 @@ const handleSubmit = async () => {
     const params = {
       ...props.userInfo,
     }
-    const res = await updateUserUsingPost(params)
+    const res = await updateUser(params)
     if (res.data.code === 0) {
       props?.onSuccess?.(props.userInfo)
       message.success('资料更新成功')

@@ -43,7 +43,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { getPictureVoByIdUsingGet, searchPictureByPictureUsingPost } from '@/api/pictureController'
+import { getPictureVoById, searchPictureByPicture } from '@/api/pictureController'
 import { message } from 'ant-design-vue'
 
 
@@ -59,7 +59,7 @@ const loading = ref<boolean>(false)
 // 获取搜图结果
 const fetchData = async () => {
   loading.value = true
-  const res = await searchPictureByPictureUsingPost({
+  const res = await searchPictureByPicture({
     pictureId: pictureId.value,
   })
   if (res.data.code === 0 && res.data.data) {
@@ -81,7 +81,7 @@ const getOldPicture = async () => {
   // 获取数据
   const id = route.query?.pictureId
   if (id) {
-    const res = await getPictureVoByIdUsingGet({
+    const res = await getPictureVoById({
       id: id,
     })
     if (res.data.code === 0 && res.data.data) {

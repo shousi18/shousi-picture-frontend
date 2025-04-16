@@ -125,7 +125,7 @@ import {
 import { message, Modal } from 'ant-design-vue'
 import { onMounted, reactive, ref } from 'vue'
 import dayjs from 'dayjs'
-import { exchangeMemberUsingPost, getUserVoByIdUsingGet } from '@/api/userController.ts'
+import { exchangeMember, getUserVoById } from '@/api/userController.ts'
 import { useRouter } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
 import EditPasswordModal from '@/components/userinfo/EditPasswordModal.vue'
@@ -148,7 +148,7 @@ const fetchUserInfo = async () => {
     message.warn('请先登录')
     return
   }
-  const res = await getUserVoByIdUsingGet({ id: loginUserStore.loginUser.id })
+  const res = await getUserVoById({ id: loginUserStore.loginUser.id })
   if (res.data.code === 0 && res.data.data) {
     userInfo.value = res.data.data
     loginUserStore.loginUser = res.data.data
@@ -230,7 +230,7 @@ const handleExchange = async () => {
   try {
     memberLoading.value = true;
     // 调用后端接口
-    const res = await exchangeMemberUsingPost({
+    const res = await exchangeMember({
       userId: loginUserStore.loginUser.id,
       code: formState.code
     });

@@ -2,9 +2,9 @@
 /* eslint-disable */
 import request from '@/request'
 
-/** addUser POST /api/user/add */
-export async function addUserUsingPost(body: API.UserAddRequest, options?: { [key: string]: any }) {
-  return request<API.BaseResponseLong_>('/api/user/add', {
+/** 此处后端没有提供注释 POST /user/add */
+export async function addUser(body: API.UserAddRequest, options?: { [key: string]: any }) {
+  return request<API.BaseResponseLong>('/user/add', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -14,12 +14,17 @@ export async function addUserUsingPost(body: API.UserAddRequest, options?: { [ke
   })
 }
 
-/** deleteUser POST /api/user/delete */
-export async function deleteUserUsingPost(
-  body: API.DeleteRequest,
-  options?: { [key: string]: any }
-) {
-  return request<API.BaseResponseBoolean_>('/api/user/delete', {
+/** 此处后端没有提供注释 POST /user/add/sign_in */
+export async function addUserSignIn(options?: { [key: string]: any }) {
+  return request<API.BaseResponseBoolean>('/user/add/sign_in', {
+    method: 'POST',
+    ...(options || {}),
+  })
+}
+
+/** 此处后端没有提供注释 POST /user/delete */
+export async function deleteUser(body: API.DeleteRequest, options?: { [key: string]: any }) {
+  return request<API.BaseResponseBoolean>('/user/delete', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -29,12 +34,12 @@ export async function deleteUserUsingPost(
   })
 }
 
-/** exchangeMember POST /api/user/exchange/member */
-export async function exchangeMemberUsingPost(
+/** 此处后端没有提供注释 POST /user/exchange/member */
+export async function exchangeMember(
   body: API.ExchangeMemberRequest,
   options?: { [key: string]: any }
 ) {
-  return request<API.BaseResponseBoolean_>('/api/user/exchange/member', {
+  return request<API.BaseResponseBoolean>('/user/exchange/member', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -44,13 +49,13 @@ export async function exchangeMemberUsingPost(
   })
 }
 
-/** getUserById GET /api/user/get */
-export async function getUserByIdUsingGet(
+/** 此处后端没有提供注释 GET /user/get */
+export async function getUserById(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.getUserByIdUsingGETParams,
+  params: API.getUserByIdParams,
   options?: { [key: string]: any }
 ) {
-  return request<API.BaseResponseUser_>('/api/user/get', {
+  return request<API.BaseResponseUser>('/user/get', {
     method: 'GET',
     params: {
       ...params,
@@ -59,20 +64,17 @@ export async function getUserByIdUsingGet(
   })
 }
 
-/** getCaptcha GET /api/user/get/captcha */
-export async function getCaptchaUsingGet(options?: { [key: string]: any }) {
-  return request<API.BaseResponseMapStringString_>('/api/user/get/captcha', {
+/** 此处后端没有提供注释 GET /user/get/captcha */
+export async function getCaptcha(options?: { [key: string]: any }) {
+  return request<API.BaseResponseMapStringString>('/user/get/captcha', {
     method: 'GET',
     ...(options || {}),
   })
 }
 
-/** getEmailCode POST /api/user/get/email_code */
-export async function getEmailCodeUsingPost(
-  body: API.EmailCodeRequest,
-  options?: { [key: string]: any }
-) {
-  return request<API.BaseResponseLong_>('/api/user/get/email_code', {
+/** 此处后端没有提供注释 POST /user/get/email_code */
+export async function getEmailCode(body: API.EmailCodeRequest, options?: { [key: string]: any }) {
+  return request<API.BaseResponseLong>('/user/get/email_code', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -82,21 +84,21 @@ export async function getEmailCodeUsingPost(
   })
 }
 
-/** getLoginUser GET /api/user/get/login */
-export async function getLoginUserUsingGet(options?: { [key: string]: any }) {
-  return request<API.BaseResponseLoginUserVO_>('/api/user/get/login', {
+/** 此处后端没有提供注释 GET /user/get/login */
+export async function getLoginUser(options?: { [key: string]: any }) {
+  return request<API.BaseResponseLoginUserVO>('/user/get/login', {
     method: 'GET',
     ...(options || {}),
   })
 }
 
-/** getUserVOById GET /api/user/get/vo */
-export async function getUserVoByIdUsingGet(
+/** 此处后端没有提供注释 GET /user/get/sign_in */
+export async function getUserSignInRecord(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.getUserVOByIdUsingGETParams,
+  params: API.getUserSignInRecordParams,
   options?: { [key: string]: any }
 ) {
-  return request<API.BaseResponseUserVO_>('/api/user/get/vo', {
+  return request<API.BaseResponseListInteger>('/user/get/sign_in', {
     method: 'GET',
     params: {
       ...params,
@@ -105,12 +107,27 @@ export async function getUserVoByIdUsingGet(
   })
 }
 
-/** listUserVOByPage POST /api/user/list/page/vo */
-export async function listUserVoByPageUsingPost(
+/** 此处后端没有提供注释 GET /user/get/vo */
+export async function getUserVoById(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.getUserVOByIdParams,
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponseUserVO>('/user/get/vo', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  })
+}
+
+/** 此处后端没有提供注释 POST /user/list/page/vo */
+export async function listUserVoByPage(
   body: API.UserQueryRequest,
   options?: { [key: string]: any }
 ) {
-  return request<API.BaseResponsePageUserVO_>('/api/user/list/page/vo', {
+  return request<API.BaseResponsePageUserVO>('/user/list/page/vo', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -120,12 +137,9 @@ export async function listUserVoByPageUsingPost(
   })
 }
 
-/** userLogin POST /api/user/login */
-export async function userLoginUsingPost(
-  body: API.UserLoginRequest,
-  options?: { [key: string]: any }
-) {
-  return request<API.BaseResponseLoginUserVO_>('/api/user/login', {
+/** 此处后端没有提供注释 POST /user/login */
+export async function userLogin(body: API.UserLoginRequest, options?: { [key: string]: any }) {
+  return request<API.BaseResponseLoginUserVO>('/user/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -135,20 +149,20 @@ export async function userLoginUsingPost(
   })
 }
 
-/** userLogout POST /api/user/logout */
-export async function userLogoutUsingPost(options?: { [key: string]: any }) {
-  return request<API.BaseResponseBoolean_>('/api/user/logout', {
+/** 此处后端没有提供注释 POST /user/logout */
+export async function userLogout(options?: { [key: string]: any }) {
+  return request<API.BaseResponseBoolean>('/user/logout', {
     method: 'POST',
     ...(options || {}),
   })
 }
 
-/** userRegister POST /api/user/register */
-export async function userRegisterUsingPost(
+/** 此处后端没有提供注释 POST /user/register */
+export async function userRegister(
   body: API.UserRegisterRequest,
   options?: { [key: string]: any }
 ) {
-  return request<API.BaseResponseLong_>('/api/user/register', {
+  return request<API.BaseResponseLong>('/user/register', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -158,12 +172,9 @@ export async function userRegisterUsingPost(
   })
 }
 
-/** updateUser POST /api/user/update */
-export async function updateUserUsingPost(
-  body: API.UserUpdateRequest,
-  options?: { [key: string]: any }
-) {
-  return request<API.BaseResponseBoolean_>('/api/user/update', {
+/** 此处后端没有提供注释 POST /user/update */
+export async function updateUser(body: API.UserUpdateRequest, options?: { [key: string]: any }) {
+  return request<API.BaseResponseBoolean>('/user/update', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -173,53 +184,34 @@ export async function updateUserUsingPost(
   })
 }
 
-/** updateUserAvatar POST /api/user/update/avatar */
-export async function updateUserAvatarUsingPost(
+/** 此处后端没有提供注释 POST /user/update/avatar */
+export async function updateUserAvatar(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.updateUserAvatarUsingPOSTParams,
+  params: API.updateUserAvatarParams,
   body: {},
-  file?: File,
   options?: { [key: string]: any }
 ) {
-  const formData = new FormData()
-
-  if (file) {
-    formData.append('file', file)
-  }
-
-  Object.keys(body).forEach((ele) => {
-    const item = (body as any)[ele]
-
-    if (item !== undefined && item !== null) {
-      if (typeof item === 'object' && !(item instanceof File)) {
-        if (item instanceof Array) {
-          item.forEach((f) => formData.append(ele, f || ''))
-        } else {
-          formData.append(ele, JSON.stringify(item))
-        }
-      } else {
-        formData.append(ele, item)
-      }
-    }
-  })
-
-  return request<API.BaseResponseString_>('/api/user/update/avatar', {
+  return request<API.BaseResponseString>('/user/update/avatar', {
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     params: {
       ...params,
+      userUpdateRequest: undefined,
+      ...params['userUpdateRequest'],
     },
-    data: formData,
-    requestType: 'form',
+    data: body,
     ...(options || {}),
   })
 }
 
-/** updateUserEmail POST /api/user/update/email */
-export async function updateUserEmailUsingPost(
+/** 此处后端没有提供注释 POST /user/update/email */
+export async function updateUserEmail(
   body: API.UserUpdateEmailRequest,
   options?: { [key: string]: any }
 ) {
-  return request<API.BaseResponseBoolean_>('/api/user/update/email', {
+  return request<API.BaseResponseBoolean>('/user/update/email', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -229,12 +221,12 @@ export async function updateUserEmailUsingPost(
   })
 }
 
-/** updateUserPassword POST /api/user/update/password */
-export async function updateUserPasswordUsingPost(
+/** 此处后端没有提供注释 POST /user/update/password */
+export async function updateUserPassword(
   body: API.UserUpdatePasswordRequest,
   options?: { [key: string]: any }
 ) {
-  return request<API.BaseResponseBoolean_>('/api/user/update/password', {
+  return request<API.BaseResponseBoolean>('/user/update/password', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

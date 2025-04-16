@@ -81,7 +81,7 @@ import {
   CloseCircleOutlined,
   ClockCircleOutlined,
 } from '@ant-design/icons-vue'
-import { deletePictureUsingPost } from '@/api/pictureController.ts'
+import { deletePicture } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
 import ShareModal from '@/components/ShareModal.vue'
 import { ref } from 'vue'
@@ -161,7 +161,7 @@ const doDelete = (picture, e) => {
   // 防止事件冒泡
   e.stopPropagation()
   if (picture?.id) {
-    deletePictureUsingPost({ id: picture?.id }).then((res) => {
+    deletePicture({ id: picture?.id }).then((res) => {
       if (res.data.code === 0) {
         message.success('删除成功')
         props?.onReload?.()

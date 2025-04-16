@@ -35,7 +35,7 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { message } from 'ant-design-vue'
-import { getEmailCodeUsingPost, updateUserEmailUsingPost } from '@/api/userController.ts'
+import { getEmailCode, updateUserEmail } from '@/api/userController.ts'
 
 interface Props {
   userInfo: API.UserVO
@@ -44,7 +44,7 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const formState = reactive({
+const formState = ref({
   newEmail: '',
   code: '',
 })
@@ -55,9 +55,9 @@ const handleSubmit = async () => {
       id: props.userInfo.id,
       ...formState,
     }
-    const res = await updateUserEmailUsingPost(params)
+    const res = await updateUserEmail(params)
     if (res.data.code === 0) {
-      props.userInfo.email = formState.newEmail
+      props.userInfo.email = formState.value.newEmail
       props?.onSuccess?.(props.userInfo)
       message.success('邮箱更新成功')
     }
@@ -77,8 +77,8 @@ let timer: NodeJS.Timeout | null = null
  */
 const sendEmailCode = async () => {
   try {
-    const res = await getEmailCodeUsingPost({
-      email: formState.newEmail,
+    const res = await getEmailCode({
+      email: formState.value.newEmail,
       type: 'changeEmail',
     })
 
@@ -87,7 +87,7 @@ const sendEmailCode = async () => {
       // 记录过期时间戳（当前时间 + 剩余秒数）
       countdown.value = res.data.data
       const expireTimestamp = Math.floor(Date.now() / 1000) + Number(res.data.data)
-      localStorage.setItem('codeEmail:changeEmail', formState.newEmail)
+      localStorage.setItem('codeEmail:changeEmail', formState.value.newEmail)
       localStorage.setItem('codeExpire:changeEmail', expireTimestamp)
       startCountdown()
     } else {
@@ -109,7 +109,7 @@ onMounted(() => {
     const remainTime = expireTime - currentTime
 
     if (remainTime > 0) {
-      formState.newEmail = savedEmail
+      formState.value.newEmail = savedEmail
       countdown.value = remainTime
       startCountdown()
     } else {

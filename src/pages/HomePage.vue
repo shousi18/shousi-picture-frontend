@@ -64,10 +64,10 @@
 
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
-import { listPictureVoByPageUsingPost } from '@/api/pictureController.ts'
+import { listPictureVoByPage } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
-import { listHotTagsUsingGet } from '@/api/tagController.ts'
-import { listHotCategoriesUsingGet } from '@/api/categoryController.ts'
+import { listHotTags } from '@/api/tagController.ts'
+import { listHotCategories } from '@/api/categoryController.ts'
 import PictureList from '@/components/picture/PictureList.vue'
 import { HomeOutlined, PictureOutlined, TagsOutlined } from '@ant-design/icons-vue'
 
@@ -114,7 +114,7 @@ const fetchData = async () => {
       params.tagIds.push(tagList.value[index].id)
     }
   })
-  const res = await listPictureVoByPageUsingPost(params)
+  const res = await listPictureVoByPage(params)
   if (res.data.code === 0 && res.data.data) {
     dataList.value = res.data.data.records ?? []
     total.value = res.data.data.total ?? 0
@@ -131,8 +131,8 @@ const fetchData = async () => {
 const getTagCategoryOptions = async () => {
   try {
     const [tagRes, categoryRes] = await Promise.all([
-      listHotTagsUsingGet(),
-      listHotCategoriesUsingGet(),
+      listHotTags(),
+      listHotCategories(),
     ])
     if (tagRes.data.code === 0 && tagRes.data.data) {
       tagList.value = tagRes.data.data

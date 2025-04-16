@@ -64,12 +64,12 @@
 <script setup lang="ts">
 import { computed, h, onMounted, reactive, ref, watch } from 'vue'
 import {
-  listPictureVoByPageUsingPost,
-  searchPictureByColorUsingPost,
+  listPictureVoByPage,
+  searchPictureByColor,
 } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
 import { formatFileSize } from '../../utils'
-import { getSpaceVoByIdUsingGet } from '@/api/spaceController.ts'
+import { getSpaceVoById } from '@/api/spaceController.ts'
 import PictureList from '@/components/picture/PictureList.vue'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
 import PictureSearchForm from '@/components/picture/PictureSearchForm.vue'
@@ -98,7 +98,7 @@ const batchEditPictureModalRef = ref()
  * @param color
  */
 const onColorChange = async (color: string) => {
-  const res = await searchPictureByColorUsingPost({
+  const res = await searchPictureByColor({
     picColor: color,
     spaceId: props.id,
   })
@@ -140,7 +140,7 @@ const fetchSpaceDetail = async () => {
   if (!props.id) {
     return
   }
-  const res = await getSpaceVoByIdUsingGet({ id: props.id })
+  const res = await getSpaceVoById({ id: props.id })
   if (res.data.code === 0 && res.data.data) {
     space.value = res.data.data
   } else {
@@ -158,7 +158,7 @@ const fetchData = async () => {
     spaceId: props.id,
     ...searchParams.value,
   }
-  const res = await listPictureVoByPageUsingPost(params)
+  const res = await listPictureVoByPage(params)
   if (res.data.code === 0 && res.data.data) {
     dataList.value = res.data.data.records ?? []
     total.value = res.data.data.total ?? 0

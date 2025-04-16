@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { listSpaceVoByPageUsingPost } from '@/api/spaceController'
+import { listSpaceVoByPage } from '@/api/spaceController'
 import { message } from 'ant-design-vue'
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
 import { SPACE_TYPE_ENUM } from '@/constant/space.ts'
@@ -24,7 +24,7 @@ const checkUserSpace = async () => {
     return
   }
   // 登录，获取用户空间信息
-  const res = await listSpaceVoByPageUsingPost({
+  const res = await listSpaceVoByPage({
     userId: loginUser.id,
     current: 1,
     pageSize: 1,

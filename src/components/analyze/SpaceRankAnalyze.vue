@@ -10,7 +10,7 @@
 import VChart from 'vue-echarts'
 import 'echarts'
 import { computed, ref, watchEffect } from 'vue'
-import { getSpaceRankAnalyzeUsingPost } from '@/api/spaceAnalyzeController.ts'
+import { getSpaceRankAnalyze } from '@/api/spaceAnalyzeController.ts'
 import { message } from 'ant-design-vue'
 
 // 图表数据
@@ -22,7 +22,7 @@ const loading = ref(true)
 const fetchData = async () => {
   loading.value = true
   // 转换搜索参数
-  const res = await getSpaceRankAnalyzeUsingPost({
+  const res = await getSpaceRankAnalyze({
     topN: 10, // 后端默认是 10
   })
   if (res.data.code === 0 && res.data.data) {

@@ -81,7 +81,7 @@
 </template>
 <script lang="ts" setup>
 import { h, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
-import { getEmailCodeUsingPost, userRegisterUsingPost } from '@/api/userController.ts'
+import { getEmailCode, userRegister } from '@/api/userController.ts'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
 import { message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
@@ -113,7 +113,7 @@ const handleSubmit = async (values: any) => {
     message.error('两次输入的密码不一致')
     return
   }
-  const res = await userRegisterUsingPost(values)
+  const res = await userRegister(values)
   // 注册成功，跳转到登录页面
   if (res.data.code === 0 && res.data.data) {
     message.success('注册成功')
@@ -133,7 +133,7 @@ let timer: NodeJS.Timeout | null = null
 // 修改发送验证码逻辑
 const sendEmailCode = async () => {
   try {
-    const res = await getEmailCodeUsingPost({
+    const res = await getEmailCode({
       email: formState.email,
       type: 'register',
     })

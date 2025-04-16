@@ -80,8 +80,8 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
 import dayjs from 'dayjs'
-import { listHotTagsUsingGet } from '@/api/tagController.ts'
-import { listHotCategoriesUsingGet } from '@/api/categoryController.ts'
+import { listHotTags } from '@/api/tagController.ts'
+import { listHotCategories } from '@/api/categoryController.ts'
 import { message } from 'ant-design-vue'
 import { PIC_REVIEW_STATUS_OPTIONS } from '@/constant/picture.ts'
 
@@ -137,8 +137,8 @@ const onRangeChange = (dates: any[], dateStrings: string[]) => {
 const getTagCategoryOptions = async () => {
   try {
     const [tagRes, categoryRes] = await Promise.all([
-      listHotTagsUsingGet(),
-      listHotCategoriesUsingGet(),
+      listHotTags(),
+      listHotCategories(),
     ])
 
     if (tagRes.data.code === 0 && tagRes.data.data) {

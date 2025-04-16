@@ -69,10 +69,10 @@ import {
   SPACE_USER_STATUS_OPTIONS,
 } from '@/constant/space.ts'
 import {
-  addSpaceUserUsingPost,
-  deleteSpaceUserUsingPost,
-  editSpaceUserUsingPost,
-  listSpaceUserUsingPost,
+  addSpaceUser,
+  deleteSpaceUser,
+  editSpaceUser,
+  listSpaceUser,
 } from '@/api/spaceUserController.ts'
 import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
 
@@ -120,7 +120,7 @@ const handleSubmit = async () => {
   if (!spaceId) {
     return
   }
-  const res = await addSpaceUserUsingPost({
+  const res = await addSpaceUser({
     spaceId,
     createUserId: loginUserStore.loginUser.id,
     ...formData,
@@ -140,7 +140,7 @@ const fetchData = async () => {
   if (!spaceId) {
     return
   }
-  const res = await listSpaceUserUsingPost({
+  const res = await listSpaceUser({
     spaceId,
     inviteStatus: SPACE_USER_STATUS_ENUM.AGREE,
   })
@@ -161,7 +161,7 @@ const handleSelectSubmit = async () => {
     inviteStatus: selectFormData.inviteStatus,
   }
   console.log(params)
-  const res = await listSpaceUserUsingPost(params)
+  const res = await listSpaceUser(params)
   if (res.data.data) {
     dataList.value = res.data.data ?? []
   } else {
@@ -173,7 +173,7 @@ const handleSelectSubmit = async () => {
  * 选择成员角色
  */
 const editSpaceRole = async (value, record) => {
-  const res = await editSpaceUserUsingPost({
+  const res = await editSpaceUser({
     id: record.id,
     spaceRole: value,
   })
@@ -194,7 +194,7 @@ const doDelete = async (id: number) => {
     message.error('id 为空')
     return
   }
-  const deleteResponse = await deleteSpaceUserUsingPost({ id })
+  const deleteResponse = await deleteSpaceUser({ id })
   if (deleteResponse.data.data && deleteResponse.data.code === 0) {
     message.success('删除成功')
     fetchData()

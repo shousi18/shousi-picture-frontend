@@ -77,7 +77,7 @@
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import { uploadDistinctPictureByBatchUsingPost, uploadPictureByBatchUsingPost } from '@/api/pictureController.ts'
+import { uploadDistinctPictureByBatch, uploadPictureByBatch } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 
@@ -98,7 +98,7 @@ const activeKey = ref<string>('common')
  */
 const handleSubmit = async (values: API.PictureUploadByBatchRequest) => {
   loading.value = true
-  const res = await uploadPictureByBatchUsingPost({
+  const res = await uploadPictureByBatch({
     ...formData,
   })
   if (res.data.code === 0 && res.data.data) {
@@ -114,7 +114,7 @@ const handleSubmit = async (values: API.PictureUploadByBatchRequest) => {
 
 const handleDistinctSubmit = async (values: API.PictureUploadByBatchRequest) => {
   loading.value = true
-  const res = await uploadDistinctPictureByBatchUsingPost({
+  const res = await uploadDistinctPictureByBatch({
     ...formData,
   })
   if (res.data.code === 0 && res.data.data) {
