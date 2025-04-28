@@ -149,7 +149,7 @@ const closeModal = () => {
 const clearHistory = async () => {
   const params = {
     pictureId: props.picture?.id,
-    spaceId: props.spaceId
+    spaceId: props.spaceId,
   }
   // 清除历史操作
   await clearEditHistory(params)
@@ -157,7 +157,7 @@ const clearHistory = async () => {
 
 // 暴露函数给父组件
 defineExpose({
-  openModal
+  openModal,
 })
 
 // ----- 实时编辑
@@ -188,7 +188,7 @@ const enterEdit = () => {
   if (webSocket) {
     // 发送进入编辑状态的消息
     webSocket.sendMessage({
-      type: PICTURE_EDIT_MESSAGE_TYPE_ENUM.ENTER_EDIT
+      type: PICTURE_EDIT_MESSAGE_TYPE_ENUM.ENTER_EDIT,
     })
   }
 }
@@ -199,7 +199,7 @@ const exitEdit = () => {
   if (webSocket) {
     // 发送退出编辑状态的消息
     webSocket.sendMessage({
-      type: PICTURE_EDIT_MESSAGE_TYPE_ENUM.EXIT_EDIT
+      type: PICTURE_EDIT_MESSAGE_TYPE_ENUM.EXIT_EDIT,
     })
   }
 }
@@ -211,7 +211,7 @@ const editAction = (action: string) => {
   if (webSocket) {
     webSocket.sendMessage({
       type: PICTURE_EDIT_MESSAGE_TYPE_ENUM.EDIT_ACTION,
-      editAction: action
+      editAction: action,
     })
   }
 }
