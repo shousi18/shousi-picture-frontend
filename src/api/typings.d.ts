@@ -224,6 +224,10 @@ declare namespace API {
     id?: number
   }
 
+  type DoThumbRequest = {
+    pictureId?: number
+  }
+
   type EmailCodeRequest = {
     email?: string
     type?: string
@@ -278,6 +282,10 @@ declare namespace API {
   type HandleInvitationRequest = {
     id?: number
     status?: number
+  }
+
+  type hasThumbParams = {
+    pictureId: number
   }
 
   type ImageSearchResult = {
@@ -392,6 +400,7 @@ declare namespace API {
     url?: string
     thumbnailUrl?: string
     picColor?: string
+    thumbCount?: number
     tagList?: TagVO[]
     category?: CategoryVO
     originUrl?: string
@@ -511,6 +520,7 @@ declare namespace API {
     createTime?: string
     updateTime?: string
     user?: UserVO
+    thumbCount?: number
   }
 
   type SearchPictureByColorRequest = {

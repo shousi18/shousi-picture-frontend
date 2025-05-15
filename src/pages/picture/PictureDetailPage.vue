@@ -48,6 +48,12 @@
             <a-descriptions-item label="大小">
               {{ formatFileSize(picture?.picSize) }}
             </a-descriptions-item>
+            <a-descriptions-item label="点赞数">
+              <a-space align="center">
+                <heart-filled style="color: #ec4899; font-size: 16px" />
+                <span>{{ picture?.thumbCount ?? 0 }}</span>
+              </a-space>
+            </a-descriptions-item>
             <a-descriptions-item label="主色调">
               <a-space>
                 {{ picture?.picColor ?? '-' }}
@@ -83,6 +89,16 @@
               <a-button type="primary" ghost @click="doShare" class="action-btn share-btn">
                 <share-alt-outlined />
               </a-button>
+              <a-button
+                type="primary"
+                ghost
+                @click="toggleLike"
+                class="action-btn like-btn"
+                :class="{ liked: isLiked }"
+              >
+                <heart-outlined v-if="!isLiked" />
+                <heart-filled v-else />
+              </a-button>
               <a-popconfirm
                 title="确认审核通过该图片吗？"
                 ok-text="确认"
@@ -91,9 +107,9 @@
               >
                 <a-button
                   v-if="
-                  picture?.reviewStatus !== PIC_REVIEW_STATUS_ENUM.PASS &&
-                  loginUserStore.loginUser.userRole === ACCESS_ENUM.ADMIN
-                "
+                    picture?.reviewStatus !== PIC_REVIEW_STATUS_ENUM.PASS &&
+                    loginUserStore.loginUser.userRole === ACCESS_ENUM.ADMIN
+                  "
                   type="link"
                 >
                   通过
@@ -101,9 +117,9 @@
               </a-popconfirm>
               <a-button
                 v-if="
-                picture?.reviewStatus !== PIC_REVIEW_STATUS_ENUM.REJECT &&
-                loginUserStore.loginUser.userRole === ACCESS_ENUM.ADMIN
-              "
+                  picture?.reviewStatus !== PIC_REVIEW_STATUS_ENUM.REJECT &&
+                  loginUserStore.loginUser.userRole === ACCESS_ENUM.ADMIN
+                "
                 danger
                 @click="handleReview(picture, PIC_REVIEW_STATUS_ENUM.REJECT)"
               >
@@ -139,13 +155,9 @@
 
 <script setup lang="ts">
 import { computed, h, onMounted, ref } from 'vue'
-import {
-  deletePicture,
-  getPictureVoById,
-  pictureReview,
-} from '@/api/pictureController.ts'
+import { deletePicture, getPictureVoById, pictureReview } from '@/api/pictureController'
 import { message } from 'ant-design-vue'
-import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
+import { useLoginUserStore } from '@/stores/useLoginUserStore'
 import { downloadImage, formatFileSize, toHexColor } from '../../utils'
 import { useRouter } from 'vue-router' // 定义数据
 import {
@@ -153,11 +165,14 @@ import {
   EditOutlined,
   DeleteOutlined,
   ShareAltOutlined,
+  HeartOutlined,
+  HeartFilled,
 } from '@ant-design/icons-vue'
-import { PIC_REVIEW_STATUS_ENUM } from '@/constant/picture.ts'
-import ACCESS_ENUM from '@/access/accessEnum.ts'
+import { PIC_REVIEW_STATUS_ENUM } from '@/constant/picture'
+import ACCESS_ENUM from '@/access/accessEnum'
 import ShareModal from '@/components/ShareModal.vue'
-import { SPACE_PERMISSION_ENUM } from '@/constant/space.ts'
+import { SPACE_PERMISSION_ENUM } from '@/constant/space'
+import { doThumb, cancelThumb, hasThumb } from '@/api/thumbController'
 
 interface Props {
   id: number | string
@@ -175,6 +190,8 @@ const loginUserStore = useLoginUserStore()
 
 const shareLink = ref<string>()
 const shareModalRef = ref()
+
+const isLiked = ref(false)
 
 // 通用权限检查函数
 function createPermissionChecker(permission: string) {
@@ -199,8 +216,24 @@ const fetchPictureDetail = async () => {
   }
 }
 
+/**
+ * 获取点赞状态
+ */
+const fetchThumbStatus = async () => {
+  if (!picture.value?.id) return
+  try {
+    const res = await hasThumb({ pictureId: picture.value.id })
+    if (res.data.code === 0) {
+      isLiked.value = res.data.data
+    }
+  } catch (error) {
+    console.error('获取点赞状态失败', error)
+  }
+}
+
 onMounted(() => {
   fetchPictureDetail()
+  fetchThumbStatus() // 获取点赞状态
 })
 
 /**
@@ -310,6 +343,48 @@ const handleReject = async () => {
     message.error('操作失败')
   } finally {
     showModal.value = false
+  }
+}
+
+/**
+ * 切换点赞状态
+ */
+const toggleLike = async () => {
+  if (!picture.value?.id) return
+
+  try {
+    if (isLiked.value) {
+      // 如果已点赞，则取消点赞
+      const res = await cancelThumb({ pictureId: picture.value.id })
+      if (res.data.code === 0 && res.data.data) {
+        isLiked.value = false
+        message.success('已取消点赞')
+        // 更新点赞计数
+        if (picture.value.thumbCount && picture.value.thumbCount > 0) {
+          picture.value.thumbCount--
+        }
+      } else {
+        message.error('取消点赞失败，' + res.data.message)
+      }
+    } else {
+      // 如果未点赞，则添加点赞
+      const res = await doThumb({ pictureId: picture.value.id })
+      if (res.data.code === 0 && res.data.data) {
+        isLiked.value = true
+        message.success('点赞成功')
+        // 更新点赞计数
+        if (picture.value.thumbCount !== undefined) {
+          picture.value.thumbCount++
+        } else {
+          picture.value.thumbCount = 1
+        }
+      } else {
+        message.error('点赞失败，' + res.data.message)
+      }
+    }
+  } catch (error) {
+    message.error('操作失败，请稍后再试')
+    console.error(error)
   }
 }
 </script>
@@ -431,6 +506,35 @@ const handleReject = async () => {
 .custom-actions :deep(.delete-btn.ant-btn-primary) {
   background: linear-gradient(135deg, #ef4444, #dc2626) !important;
   box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);
+}
+
+/* 点赞按钮 - 粉红色渐变 */
+.custom-actions :deep(.like-btn.ant-btn-primary) {
+  background: linear-gradient(135deg, #ec4899, #db2777) !important;
+  box-shadow: 0 4px 15px rgba(236, 72, 153, 0.35);
+}
+
+/* 已点赞状态 */
+.custom-actions :deep(.like-btn.liked) {
+  background: linear-gradient(135deg, #ec4899, #db2777) !important;
+  color: white !important;
+}
+
+.custom-actions :deep(.like-btn.liked .anticon) {
+  color: white !important;
+}
+
+/* 按钮发光效果（动画） */
+@keyframes shine {
+  0% {
+    left: -100%;
+  }
+  20% {
+    left: 100%;
+  }
+  100% {
+    left: 100%;
+  }
 }
 
 /* 图标样式 */

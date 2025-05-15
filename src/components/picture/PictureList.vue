@@ -26,6 +26,10 @@
                     {{ tag.tagName }}
                   </a-tag>
                 </a-flex>
+                <a-flex align="center" style="margin-top: 8px" v-if="picture.thumbCount">
+                  <heart-filled style="color: #ec4899; margin-right: 4px; font-size: 16px" />
+                  <span>{{ picture.thumbCount }}</span>
+                </a-flex>
               </template>
             </a-card-meta>
             <template v-if="showOp" #actions>
@@ -55,7 +59,7 @@
               </a-space>
               <a-space v-else-if="picture.reviewStatus === PIC_REVIEW_STATUS_ENUM.REJECT">
                 <close-circle-outlined style="color: #ef4444; font-size: 16px" />
-                <span class="status-reject">已拒绝：{{ picture?.reviewMessage}}</span>
+                <span class="status-reject">已拒绝：{{ picture?.reviewMessage }}</span>
               </a-space>
               <a-space v-else-if="picture.reviewStatus === PIC_REVIEW_STATUS_ENUM.REVIEWING">
                 <clock-circle-outlined style="color: #64748b; font-size: 16px" />
@@ -80,6 +84,7 @@ import {
   CheckCircleOutlined,
   CloseCircleOutlined,
   ClockCircleOutlined,
+  HeartFilled,
 } from '@ant-design/icons-vue'
 import { deletePicture } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
