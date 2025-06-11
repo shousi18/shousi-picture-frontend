@@ -9,3 +9,15 @@ export async function createVipCode(options?: { [key: string]: any }) {
     ...(options || {}),
   })
 }
+
+/** 此处后端没有提供注释 POST /member/list_vip_code */
+export async function listVipCode(body: API.MemberQueryRequest, options?: { [key: string]: any }) {
+  return request<API.BaseResponseIPageMember>('/member/list_vip_code', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  })
+}
