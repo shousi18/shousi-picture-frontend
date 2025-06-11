@@ -95,6 +95,12 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponseListString = {
+    code?: number
+    data?: string[]
+    message?: string
+  }
+
   type BaseResponseListTagVO = {
     code?: number
     data?: TagVO[]
@@ -208,6 +214,10 @@ declare namespace API {
     createTime?: string
   }
 
+  type consumerMemberCodeParams = {
+    code: string
+  }
+
   type CreateOutPaintingTaskResponse = {
     output?: Output
     code?: string
@@ -303,6 +313,7 @@ declare namespace API {
     vipExpireTime?: string
     vipCode?: string
     vipNumber?: number
+    balance?: number
     shareCode?: string
     inviteUser?: number
     editTime?: string
@@ -403,6 +414,8 @@ declare namespace API {
     thumbCount?: number
     tagList?: TagVO[]
     category?: CategoryVO
+    tagNames?: string[]
+    categoryName?: string
     originUrl?: string
     name?: string
     introduction?: string
@@ -760,6 +773,7 @@ declare namespace API {
     vipExpireTime?: string
     vipCode?: string
     vipNumber?: number
+    balance?: number
     shareCode?: string
     inviteUser?: number
     editTime?: string
@@ -833,5 +847,7 @@ declare namespace API {
     userProfile?: string
     userRole?: string
     createTime?: string
+    vipExpireTime?: string
+    balance?: number
   }
 }

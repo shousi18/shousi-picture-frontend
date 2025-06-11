@@ -22,6 +22,21 @@ export async function addUserSignIn(options?: { [key: string]: any }) {
   })
 }
 
+/** 此处后端没有提供注释 GET /user/consumer/membercode */
+export async function consumerMemberCode(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.consumerMemberCodeParams,
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponseBoolean>('/user/consumer/membercode', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  })
+}
+
 /** 此处后端没有提供注释 POST /user/delete */
 export async function deleteUser(body: API.DeleteRequest, options?: { [key: string]: any }) {
   return request<API.BaseResponseBoolean>('/user/delete', {
@@ -87,6 +102,14 @@ export async function getEmailCode(body: API.EmailCodeRequest, options?: { [key:
 /** 此处后端没有提供注释 GET /user/get/login */
 export async function getLoginUser(options?: { [key: string]: any }) {
   return request<API.BaseResponseLoginUserVO>('/user/get/login', {
+    method: 'GET',
+    ...(options || {}),
+  })
+}
+
+/** 此处后端没有提供注释 GET /user/get/membercode */
+export async function getMemberCode(options?: { [key: string]: any }) {
+  return request<API.BaseResponseString>('/user/get/membercode', {
     method: 'GET',
     ...(options || {}),
   })
