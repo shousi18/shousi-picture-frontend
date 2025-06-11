@@ -567,6 +567,10 @@ declare namespace API {
     updateTime?: string
     user?: UserVO
     thumbCount?: number
+    thumbNum?: number
+    hasThumb?: boolean
+    favouriteNum?: number
+    hasFavourite?: boolean
   }
 
   type SearchPictureByColorRequest = {
@@ -882,34 +886,5 @@ declare namespace API {
     createTime?: string
     vipExpireTime?: string
     balance?: number
-  }
-
-  interface Member {
-    id: number
-    vipCode: string
-    status: number
-    createTime: string
-    useTime: string
-  }
-
-  interface MemberQueryRequest {
-    vipCode?: string
-    status?: number
-    current: number
-    pageSize: number
-  }
-
-  interface IPageMember {
-    records: Member[]
-    total: number
-    size: number
-    current: number
-    pages: number
-  }
-
-  interface BaseResponseIPageMember {
-    code: number
-    data: IPageMember
-    message: string
   }
 }

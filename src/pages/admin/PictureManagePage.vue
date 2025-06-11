@@ -7,6 +7,16 @@
         <a-button type="primary" href="/add_picture/batch">+ 创建批量图片</a-button>
       </a-space>
     </a-flex>
+    <!-- 批量操作按钮 -->
+    <a-space style="margin-bottom: 16px" v-if="selectedRowKeys.length > 0">
+      <span style="margin-left: 8px"> 已选择 {{ selectedRowKeys.length }} 项 </span>
+      <a-button type="primary" @click="handleBatchReview(PIC_REVIEW_STATUS_ENUM.PASS)">
+        批量通过
+      </a-button>
+      <a-button danger @click="handleBatchReview(PIC_REVIEW_STATUS_ENUM.REJECT)">
+        批量拒绝
+      </a-button>
+    </a-space>
     <a-form layout="inline" :model="searchParams" @finish="doSearch">
       <a-form-item label="关键词" name="searchText">
         <a-input
@@ -46,6 +56,14 @@
       :columns="columns"
       :data-source="dataList"
       :pagination="pagination"
+      :row-selection="{
+        type: 'checkbox',
+        preserveSelectedRowKeys: true,
+        selectedRowKeys: selectedRowKeys,
+        onChange: handleSelectionChange,
+        getCheckboxProps: getCheckboxProps,
+      }"
+      :row-key="(record) => record.id"
       @change="doTableChange"
     >
       <template #bodyCell="{ column, record }">
@@ -58,9 +76,7 @@
         </template>
         <template v-if="column.dataIndex === 'tagList'">
           <a-space wrap>
-            <a-tag v-for="tag in record.tagList" :key="tag">{{
-              tag?.tagName
-            }}</a-tag>
+            <a-tag v-for="tag in record.tagList" :key="tag">{{ tag?.tagName }}</a-tag>
           </a-space>
         </template>
         <!-- 图片信息 -->
@@ -117,8 +133,8 @@
     </a-table>
     <a-modal
       v-model:open="showModal"
-      title="拒绝原因"
-      @ok="handleReject"
+      :title="isBatchReject ? '批量拒绝原因' : '拒绝原因'"
+      @ok="isBatchReject ? handleBatchReject : handleReject"
       @cancel="
         () => {
           showModal = false
@@ -128,7 +144,7 @@
     >
       <a-textarea
         v-model:value="rejectReason"
-        placeholder="请输入拒绝原因"
+        :placeholder="isBatchReject ? '请输入批量拒绝原因' : '请输入拒绝原因'"
         :row="2"
         show-count
         :maxlength="50"
@@ -145,12 +161,13 @@ import {
   deletePicture,
   listPictureByPage,
   pictureReview,
-} from '@/api/pictureController.ts'
+  pictureReviewBatch,
+} from '@/api/pictureController'
 import {
   PIC_REVIEW_STATUS_ENUM,
   PIC_REVIEW_STATUS_MAP,
   PIC_REVIEW_STATUS_OPTIONS,
-} from '../../constant/picture.ts'
+} from '../../constant/picture'
 
 const columns = [
   {
@@ -207,11 +224,25 @@ const columns = [
 ]
 
 // 数据
-const dataList = ref<any>([])
+const dataList = ref<API.PictureVO[]>([])
 const total = ref(0)
 const currentRecord = ref<API.PictureVO | null>(null)
 const showModal = ref<boolean>(false)
-const rejectReason = ref<any>()
+const rejectReason = ref<string>('')
+const selectedRowKeys = ref<number[]>([])
+const isBatchReject = ref<boolean>(false)
+
+// 处理选择变化
+const handleSelectionChange = (keys: number[], selectedRows: API.PictureVO[]) => {
+  selectedRowKeys.value = selectedRows.filter((row) => row && row.id).map((row) => row.id as number)
+}
+
+// 获取复选框属性
+const getCheckboxProps = (record: API.PictureVO) => ({
+  disabled: record.reviewStatus === PIC_REVIEW_STATUS_ENUM.PASS,
+  name: record.id?.toString(),
+})
+
 // 搜索条件
 const searchParams = reactive<API.PictureQueryRequest>({
   current: 1,
@@ -279,13 +310,89 @@ const doDelete = async (id: number) => {
 }
 
 /**
+ * 处理批量审核
+ * @param reviewStatus
+ */
+const handleBatchReview = async (reviewStatus: number) => {
+  if (selectedRowKeys.value.length === 0) {
+    message.warning('请选择要审核的图片')
+    return
+  }
+
+  if (reviewStatus === PIC_REVIEW_STATUS_ENUM.REJECT) {
+    isBatchReject.value = true
+    showModal.value = true
+    return
+  }
+
+  try {
+    // 确保所有id都是有效的数字
+    const validIds = selectedRowKeys.value.filter((id) => id > 0)
+    if (validIds.length === 0) {
+      message.warning('没有有效的图片ID')
+      return
+    }
+
+    const res = await pictureReviewBatch(validIds)
+    if (res.data.code === 0) {
+      message.success('批量审核成功')
+      selectedRowKeys.value = []
+      fetchData()
+    } else {
+      message.error('批量审核失败：' + res.data.message)
+    }
+  } catch (error) {
+    message.error('批量审核失败，请重试')
+  }
+}
+
+/**
+ * 处理批量拒绝
+ */
+const handleBatchReject = async () => {
+  if (!rejectReason.value.trim()) {
+    message.warning('请输入拒绝原因')
+    return
+  }
+
+  try {
+    // 确保所有id都是有效的数字
+    const validIds = selectedRowKeys.value.filter((id) => id > 0)
+    if (validIds.length === 0) {
+      message.warning('没有有效的图片ID')
+      return
+    }
+
+    // 对选中的每个图片进行拒绝操作
+    const promises = validIds.map((id) =>
+      pictureReview({
+        id,
+        reviewStatus: PIC_REVIEW_STATUS_ENUM.REJECT,
+        reviewMessage: rejectReason.value,
+      }),
+    )
+
+    await Promise.all(promises)
+    message.success('批量拒绝成功')
+    showModal.value = false
+    rejectReason.value = ''
+    selectedRowKeys.value = []
+    isBatchReject.value = false
+    fetchData()
+  } catch (error) {
+    message.error('批量拒绝失败，请重试')
+  }
+}
+
+/**
  * 处理审核
  * @param record
  * @param reviewStatus
  */
-const handleReview = async (record: API.Picture, reviewStatus: number) => {
+const handleReview = async (record: API.PictureVO, reviewStatus: number) => {
   if (reviewStatus === PIC_REVIEW_STATUS_ENUM.REJECT) {
     currentRecord.value = record
+    isBatchReject.value = false
     showModal.value = true
     return
   }
@@ -296,10 +403,9 @@ const handleReview = async (record: API.Picture, reviewStatus: number) => {
   })
   if (res.data.code === 0) {
     message.success('审核成功')
-    // 重新获取列表
     fetchData()
   } else {
-    message.error(`审核失败`, res.data.message)
+    message.error('审核失败：' + res.data.message)
   }
 }
 

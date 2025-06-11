@@ -179,6 +179,18 @@ export async function pictureReview(
   })
 }
 
+/** 此处后端没有提供注释 POST /picture/review/batch */
+export async function pictureReviewBatch(body: number[], options?: { [key: string]: any }) {
+  return request<API.BaseResponseBoolean>('/picture/review/batch', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  })
+}
+
 /** 此处后端没有提供注释 POST /picture/search/color */
 export async function searchPictureByColor(
   body: API.SearchPictureByColorRequest,
