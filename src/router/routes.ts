@@ -1,6 +1,11 @@
 import type { RouteRecordRaw } from 'vue-router'
 import HomePage from '@/pages/HomePage.vue'
-import { HomeOutlined, MessageOutlined, PlusCircleOutlined, UploadOutlined } from '@ant-design/icons-vue'
+import {
+  HomeOutlined,
+  MessageOutlined,
+  PlusCircleOutlined,
+  UploadOutlined,
+} from '@ant-design/icons-vue'
 import UserLoginPage from '@/pages/user/UserLoginPage.vue'
 import UserRegisterPage from '@/pages/user/UserRegisterPage.vue'
 import UserManagePage from '@/pages/admin/UserManagePage.vue'
@@ -21,6 +26,7 @@ import SpaceUserManagePage from '@/pages/admin/SpaceUserManagePage.vue'
 import UserInfoPage from '@/pages/user/UserInfoPage.vue'
 import MyPicturesPage from '@/pages/user/MyPicturesPage.vue'
 import MyMessagePage from '@/pages/user/MyMessagePage.vue'
+import MemberCodePage from '@/pages/admin/MemberCodePage.vue'
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -68,6 +74,14 @@ export const routes: Array<RouteRecordRaw> = [
           access: ACCESS_ENUM.ADMIN,
         },
       },
+      {
+        path: '/admin/memberCode',
+        name: '会员码管理',
+        component: MemberCodePage,
+        meta: {
+          access: ACCESS_ENUM.ADMIN,
+        },
+      },
     ],
     meta: {
       access: ACCESS_ENUM.ADMIN,
@@ -88,7 +102,7 @@ export const routes: Array<RouteRecordRaw> = [
     component: UserInfoPage,
     meta: {
       hideInMenu: true,
-    }
+    },
   },
   {
     path: '/add_picture',
@@ -96,7 +110,7 @@ export const routes: Array<RouteRecordRaw> = [
     component: AddPicturePage,
     meta: {
       icon: () => h(PlusCircleOutlined),
-    }
+    },
   },
   {
     path: '/add_picture/batch',
@@ -187,6 +201,6 @@ export const routes: Array<RouteRecordRaw> = [
     props: true,
     meta: {
       hideInMenu: true,
-    }
+    },
   },
 ]

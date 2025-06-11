@@ -23,6 +23,12 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponseIPageMember = {
+    code?: number
+    data?: IPageMember
+    message?: string
+  }
+
   type BaseResponseListCategoryVO = {
     code?: number
     data?: CategoryVO[]
@@ -303,6 +309,14 @@ declare namespace API {
     fromUrl?: string
   }
 
+  type IPageMember = {
+    size?: number
+    current?: number
+    records?: Member[]
+    total?: number
+    pages?: number
+  }
+
   type LoginUserVO = {
     id?: number
     userAccount?: string
@@ -319,6 +333,25 @@ declare namespace API {
     editTime?: string
     createTime?: string
     updateTime?: string
+  }
+
+  type Member = {
+    id?: number
+    vipCode?: string
+    userId?: number
+    createTime?: string
+    editTime?: string
+    updateTime?: string
+    isDelete?: number
+  }
+
+  type MemberQueryRequest = {
+    current?: number
+    pageSize?: number
+    sortField?: string
+    sortOrder?: string
+    vipCode?: string
+    userId?: number
   }
 
   type OrderItem = {
@@ -849,5 +882,34 @@ declare namespace API {
     createTime?: string
     vipExpireTime?: string
     balance?: number
+  }
+
+  interface Member {
+    id: number
+    vipCode: string
+    status: number
+    createTime: string
+    useTime: string
+  }
+
+  interface MemberQueryRequest {
+    vipCode?: string
+    status?: number
+    current: number
+    pageSize: number
+  }
+
+  interface IPageMember {
+    records: Member[]
+    total: number
+    size: number
+    current: number
+    pages: number
+  }
+
+  interface BaseResponseIPageMember {
+    code: number
+    data: IPageMember
+    message: string
   }
 }
