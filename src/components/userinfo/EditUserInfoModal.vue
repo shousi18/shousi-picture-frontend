@@ -3,129 +3,152 @@
   <a-modal
     v-model:visible="visible"
     title="编辑资料"
-    :width="600"
-    :destroyOnClose="true"
-    @cancel="closeModal"
+    ok-text="确认"
+    cancel-text="取消"
+    @ok="handleOk"
+    @cancel="handleCancel"
+    :confirm-loading="confirmLoading"
   >
-    <!-- 头像上传区域 -->
-    <div class="avatar-upload-container">
-      <div class="avatar-wrapper">
-        <a-avatar :src="userInfo.userAvatar" :size="80" />
-        <div class="upload-icon" @click="showFileUploadDialog">
-          <PlusOutlined />
-        </div>
-      </div>
-      <input
-        type="file"
-        ref="fileInput"
-        style="display: none"
-        accept="image/*"
-        @change="handleAvatarUpload"
-      />
-    </div>
-
-    <!-- 头像裁剪组件 -->
-    <AvatarCropper ref="avatarCropperRef" :imageUrl="tempImageUrl" @success="handleCropperAvatar" />
-
-    <!-- 编辑表单 -->
-    <a-form ref="formRef" :model="userInfo" :label-col="{ span: 4 }" :wrapper-col="{ span: 18 }">
-      <a-form-item
-        label="用户名"
-        name="userName"
-        :rules="[{ required: true, message: '请输入用户名' }]"
-      >
-        <a-input v-model:value="userInfo.userName" />
+    <a-form
+      :model="formState"
+      :rules="rules"
+      ref="formRef"
+      layout="vertical"
+      name="edit_userinfo_form"
+    >
+      <a-form-item label="用户名" name="userName">
+        <a-input v-model:value="formState.userName" placeholder="请输入用户名" />
       </a-form-item>
-
-      <a-form-item label="个人简介">
-        <a-textarea v-model:value="userInfo.userProfile" :auto-size="{ minRows: 3, maxRows: 5 }" />
+      <a-form-item label="个人简介" name="userProfile">
+        <a-textarea
+          v-model:value="formState.userProfile"
+          placeholder="请输入个人简介"
+          :rows="4"
+          :maxlength="200"
+          show-count
+        />
+      </a-form-item>
+      <a-form-item label="头像" name="userAvatar">
+        <div class="avatar-upload">
+          <a-upload
+            v-model:file-list="fileList"
+            name="file"
+            list-type="picture-card"
+            class="avatar-uploader"
+            :show-upload-list="false"
+            :before-upload="beforeUpload"
+            @change="handleChange"
+          >
+            <img v-if="imageUrl" :src="imageUrl" alt="avatar" style="width: 100%" />
+            <div v-else>
+              <loading-outlined v-if="loading"></loading-outlined>
+              <plus-outlined v-else></plus-outlined>
+              <div class="ant-upload-text">上传</div>
+            </div>
+          </a-upload>
+        </div>
       </a-form-item>
     </a-form>
-
-    <template #footer>
-      <a-button @click="closeModal">取消</a-button>
-      <a-button type="primary" @click="handleSubmit">保存修改</a-button>
-    </template>
   </a-modal>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 import { message } from 'ant-design-vue'
-import { PlusOutlined } from '@ant-design/icons-vue'
-import AvatarCropper from '@/components/userinfo/AvatarCropper.vue'
-import { updateUserAvatar, updateUser } from '@/api/userController.ts'
+import type { FormInstance, UploadChangeParam, UploadProps } from 'ant-design-vue'
+import { LoadingOutlined, PlusOutlined } from '@ant-design/icons-vue'
+import { updateUser } from '@/api/userController'
 
-interface Props {
+const props = defineProps<{
   userInfo: API.UserVO
   onSuccess?: (newUserInfo: API.UserVO) => void
-}
+}>()
 
-const props = defineProps<Props>()
-
-// 头像相关逻辑
-const fileInput = ref<HTMLInputElement | null>(null)
-const avatarCropperRef = ref()
-const tempImageUrl = ref('')
-
-const showFileUploadDialog = () => {
-  fileInput.value?.click()
-}
-
-const handleAvatarUpload = (e: Event) => {
-  const file = (e.target as HTMLInputElement).files?.[0]
-  if (file) {
-    tempImageUrl.value = URL.createObjectURL(file)
-    avatarCropperRef.value?.openModal()
-    ;(e.target as HTMLInputElement).value = ''
-  }
-}
-
-const handleCropperAvatar = async (file: File) => {
-  try {
-    const res = await updateUserAvatar({ id: props.userInfo.id }, {}, file)
-    if (res.data.code === 0) {
-      message.success('头像更新成功')
-      props.userInfo.userAvatar = res.data.data
-      props?.onSuccess?.(props.userInfo)
-      closeCropperModal()
-    }
-  } catch (error) {
-    message.error('头像上传失败')
-  }
-}
-
-const closeCropperModal = () => {
-  if (avatarCropperRef.value) {
-    avatarCropperRef.value.closeModal()
-  }
-}
-
-const handleSubmit = async () => {
-  try {
-    const params = {
-      ...props.userInfo,
-    }
-    const res = await updateUser(params)
-    if (res.data.code === 0) {
-      props?.onSuccess?.(props.userInfo)
-      message.success('资料更新成功')
-    }
-  } catch (error) {
-    message.error('更新失败')
-  } finally {
-    closeModal()
-  }
-}
-// 控制视图
 const visible = ref(false)
+const confirmLoading = ref(false)
+const formRef = ref<FormInstance>()
+const loading = ref<boolean>(false)
+const imageUrl = ref<string>(props.userInfo.userAvatar || '')
+const fileList = ref([])
+
+const formState = reactive<API.UserUpdateRequest>({
+  id: props.userInfo.id,
+  userName: props.userInfo.userName,
+  userProfile: props.userInfo.userProfile,
+  userAvatar: props.userInfo.userAvatar,
+})
+
+const rules = {
+  userName: [
+    { required: true, message: '请输入用户名' },
+    { min: 2, max: 16, message: '用户名长度在2-16个字符之间' },
+  ],
+  userProfile: [{ max: 200, message: '个人简介不能超过200个字符' }],
+}
+
+const beforeUpload = (file: File) => {
+  const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png'
+  if (!isJpgOrPng) {
+    message.error('只能上传 JPG/PNG 格式的图片!')
+  }
+  const isLt2M = file.size / 1024 / 1024 < 2
+  if (!isLt2M) {
+    message.error('图片大小不能超过 2MB!')
+  }
+  return isJpgOrPng && isLt2M
+}
+
+const getBase64 = (img: File, callback: (base64Url: string) => void) => {
+  const reader = new FileReader()
+  reader.addEventListener('load', () => callback(reader.result as string))
+  reader.readAsDataURL(img)
+}
+
+const handleChange = (info: UploadChangeParam) => {
+  if (info.file.status === 'uploading') {
+    loading.value = true
+    return
+  }
+  if (info.file.status === 'done') {
+    getBase64(info.file.originFileObj as File, (url) => {
+      loading.value = false
+      imageUrl.value = url
+      formState.userAvatar = url
+    })
+  }
+  if (info.file.status === 'error') {
+    loading.value = false
+    message.error('上传失败')
+  }
+}
+
+const handleOk = async () => {
+  try {
+    await formRef.value?.validate()
+    confirmLoading.value = true
+    const res = await updateUser(formState)
+    if (res.data.code === 0) {
+      message.success('修改成功')
+      props.onSuccess?.(res.data.data)
+      handleCancel()
+    } else {
+      message.error('修改失败：' + res.data.message)
+    }
+  } catch {
+    // 表单验证失败
+  } finally {
+    confirmLoading.value = false
+  }
+}
+
+const handleCancel = () => {
+  formRef.value?.resetFields()
+  visible.value = false
+  imageUrl.value = props.userInfo.userAvatar || ''
+}
 
 const openModal = () => {
   visible.value = true
-}
-
-const closeModal = () => {
-  visible.value = false
 }
 
 defineExpose({
@@ -134,58 +157,15 @@ defineExpose({
 </script>
 
 <style scoped>
-/* 头像上传区域优化 */
-.avatar-wrapper {
-  position: relative;
-  display: inline-block;
-  padding: 4px;
-  background: white;
-  border-radius: 50%;
-  cursor: pointer;
-  margin: 0;
-  align-items: center;
-  justify-content: center;
-  width: fit-content;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-  background: linear-gradient(135deg, rgba(255, 142, 83, 0.1) 0%, rgba(255, 107, 107, 0.1) 100%);
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(255, 142, 83, 0.15);
-  }
-
-  &:active {
-    transform: translateY(0);
+.avatar-uploader {
+  :deep(.ant-upload) {
+    width: 128px;
+    height: 128px;
   }
 }
 
-.avatar-upload-container {
-  position: relative;
-  text-align: center;
-  padding: 16px 0;
-  margin-bottom: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.upload-icon {
-  position: absolute;
-  bottom: -4px;
-  right: -4px;
-  width: 28px;
-  height: 28px;
-  background: linear-gradient(135deg, #ff8e53 0%, #ff6b6b 100%);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
-  z-index: 2;
-  border: 2px solid white;
+.ant-upload-text {
+  margin-top: 8px;
+  color: #666;
 }
 </style>

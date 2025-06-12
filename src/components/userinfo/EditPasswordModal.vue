@@ -3,109 +3,98 @@
   <a-modal
     v-model:visible="visible"
     title="修改密码"
-    :width="600"
-    :destroyOnClose="true"
-    @cancel="closeModal"
-    class="password-modal"
+    ok-text="确认"
+    cancel-text="取消"
+    @ok="handleOk"
+    @cancel="handleCancel"
+    :confirm-loading="confirmLoading"
   >
-    <div class="password-form">
-      <!-- 编辑表单 -->
-      <a-form ref="formRef" :model="formSates" layout="vertical">
-        <a-form-item
-          label="密码"
-          name="oldPassword"
-          :rules="[{ required: true, message: '请输入您的旧密码', trigger: 'blur' }]"
-        >
-          <a-input-password v-model:value="formSates.oldPassword" />
-        </a-form-item>
-
-        <a-form-item
-          label="新密码"
-          name="newPassword"
-          :rules="[{ required: true, message: '请输入新密码', trigger: 'blur' }]"
-        >
-          <a-input-password v-model:value="formSates.newPassword" />
-        </a-form-item>
-        <a-form-item
-          label="确认密码"
-          name="checkPassword"
-          :rules="[{ required: true, message: '请确认您的新密码', trigger: 'blur' }]"
-        >
-          <a-input-password v-model:value="formSates.checkPassword" />
-        </a-form-item>
-      </a-form>
-    </div>
-    <template #footer>
-      <a-button @click="closeModal">取消</a-button>
-      <a-button type="primary" @click="handleSubmit">确认修改</a-button>
-    </template>
+    <a-form
+      :model="formState"
+      :rules="rules"
+      ref="formRef"
+      layout="vertical"
+      name="edit_password_form"
+    >
+      <a-form-item label="原密码" name="oldPassword">
+        <a-input-password v-model:value="formState.oldPassword" placeholder="请输入原密码" />
+      </a-form-item>
+      <a-form-item label="新密码" name="newPassword">
+        <a-input-password v-model:value="formState.newPassword" placeholder="请输入新密码" />
+      </a-form-item>
+      <a-form-item label="确认密码" name="checkPassword">
+        <a-input-password v-model:value="formState.checkPassword" placeholder="请再次输入新密码" />
+      </a-form-item>
+    </a-form>
   </a-modal>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { ref, reactive } from 'vue'
 import { message } from 'ant-design-vue'
+import type { FormInstance } from 'ant-design-vue'
+import { updateUserPassword } from '@/api/userController'
 
-import { updateUserPassword } from '@/api/userController.ts'
-
-interface Props {
+const props = defineProps<{
   userInfo: API.UserVO
-  onSuccess?: (newUserInfo: API.UserVO) => void
-}
+}>()
 
-const props = defineProps<Props>()
+const visible = ref(false)
+const confirmLoading = ref(false)
+const formRef = ref<FormInstance>()
 
-const formSates = reactive({
+const formState = reactive<API.UserUpdatePasswordRequest>({
+  id: undefined,
   oldPassword: '',
   newPassword: '',
   checkPassword: '',
 })
 
-const formRef = ref()
-const handleSubmit = async () => {
-  try {
-    await formRef.value.validate()
-  } catch (error) {
-    if (error.errorFields) {
-      message.error('表单填写错误')
-    }
-    return
-  }
+const rules = {
+  oldPassword: [{ required: true, message: '请输入原密码' }],
+  newPassword: [
+    { required: true, message: '请输入新密码' },
+    { min: 8, message: '密码长度不能小于8位' },
+  ],
+  checkPassword: [
+    { required: true, message: '请再次输入新密码' },
+    {
+      validator: async (_rule: any, value: string) => {
+        if (value && value !== formState.newPassword) {
+          return Promise.reject('两次输入的密码不一致')
+        }
+        return Promise.resolve()
+      },
+    },
+  ],
+}
 
+const handleOk = async () => {
   try {
-    const params = {
-      id: props.userInfo.id,
-      ...formSates,
-    }
-    const res = await updateUserPassword(params)
+    await formRef.value?.validate()
+    confirmLoading.value = true
+    formState.id = props.userInfo.id
+    const res = await updateUserPassword(formState)
     if (res.data.code === 0) {
-      props?.onSuccess?.(props.userInfo)
-      message.success('密码修改成功')
-      closeModal()
-      clearFormState()
+      message.success('修改成功')
+      handleCancel()
     } else {
-      message.error(res.data.message)
+      message.error('修改失败：' + res.data.message)
     }
-  } catch (error) {
-    message.error('更新失败')
+  } catch {
+    // 表单验证失败
+  } finally {
+    confirmLoading.value = false
   }
 }
-// 表单清空
-const clearFormState = () => {
-  Object.keys(formSates).map((key) => {
-    formSates[key] = ''
-  })
-}
 
-// 控制视图
-const visible = ref(false)
+const handleCancel = () => {
+  formRef.value?.resetFields()
+  visible.value = false
+}
 
 const openModal = () => {
   visible.value = true
-}
-
-const closeModal = () => {
-  visible.value = false
 }
 
 defineExpose({
