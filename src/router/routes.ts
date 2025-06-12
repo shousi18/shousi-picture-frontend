@@ -28,6 +28,7 @@ import MyPicturesPage from '@/pages/user/MyPicturesPage.vue'
 import MyMessagePage from '@/pages/user/MyMessagePage.vue'
 import MemberCodePage from '@/pages/admin/MemberCodePage.vue'
 import ExchangeMemberPage from '@/pages/member/ExchangeMemberPage.vue'
+import CategoryManagePage from '@/pages/admin/CategoryManagePage.vue'
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -79,6 +80,14 @@ export const routes: Array<RouteRecordRaw> = [
         path: '/admin/memberCode',
         name: '会员码管理',
         component: MemberCodePage,
+        meta: {
+          access: ACCESS_ENUM.ADMIN,
+        },
+      },
+      {
+        path: '/admin/categoryManage',
+        name: '分类管理',
+        component: CategoryManagePage,
         meta: {
           access: ACCESS_ENUM.ADMIN,
         },
