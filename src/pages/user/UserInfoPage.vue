@@ -44,12 +44,32 @@
                 <a-descriptions-item label="我的id">
                   {{ userInfo.id }}
                 </a-descriptions-item>
+                <a-descriptions-item label="当前余额">
+                  <span style="color: #1890ff; font-weight: bold;">{{ userInfo.balance || 0 }}</span> 积分
+                </a-descriptions-item>
                 <a-descriptions-item label="注册时间">
                   {{ formatTime(userInfo.createTime) }}
                 </a-descriptions-item>
               </a-descriptions>
             </div>
           </a-spin>
+        </a-card>
+
+        <!-- 签到日历 -->
+        <a-card title="签到记录" :bordered="false" class="calendar-card">
+          <div class="calendar-header">
+            <div class="calendar-stats">
+              <div class="stats-item">
+                <div class="stats-value">{{ dataList.length }}</div>
+                <div class="stats-label">累计签到</div>
+              </div>
+              <div class="stats-item">
+                <div class="stats-value">{{ isSignIn ? '已签到' : '未签到' }}</div>
+                <div class="stats-label">今日状态</div>
+              </div>
+            </div>
+          </div>
+          <v-chart :option="options" autoresize class="calendar-chart" />
         </a-card>
       </a-col>
       <!-- 右侧操作栏 -->
@@ -97,7 +117,7 @@
 
         <a-modal
           v-model:visible="showExchangeModal"
-          title="兑换会员"
+          title="使用会员兑换码"
           ok-text="确认兑换"
           @ok="handleExchange"
           cancel-text="取消"
@@ -115,13 +135,12 @@
             </a-form-item>
           </a-form>
           <div class="text-gray-600 text-sm">
-            如需要会员，请联系管理员进行购买：
-            <a-tooltip placement="bottom">
-              <template #title>
-                <img :src="wechat" alt="微信" width="120" />
-              </template>
-              <a class="text-blue-500">向日葵</a>
-            </a-tooltip>
+            <p>您可以通过以下方式获取会员兑换码：</p>
+            <ol class="ml-4">
+              <li>1. 使用300积分兑换3天会员</li>
+              <li>2. 联系管理员购买会员兑换码</li>
+            </ol>
+            <router-link to="/member/exchange" class="text-blue-500"> 前往积分兑换 </router-link>
           </div>
         </a-modal>
       </a-col>
@@ -135,10 +154,6 @@
 
     <!-- 修改邮箱模态框组件 -->
     <EditEmailModal ref="editEmail" :user-info="userInfo" :onSuccess="handleEmailSuccess" />
-  </div>
-
-  <div class="sign-in-calendar">
-    <v-chart :option="options" autoresize class="calendar-chart" />
   </div>
 </template>
 
@@ -159,17 +174,17 @@ import 'echarts-wordcloud'
 import dayjs from 'dayjs'
 import {
   addUserSignIn,
+  consumerMemberCode,
   exchangeMember,
   getUserSignInRecord,
   getUserVoById,
-} from '@/api/userController.ts'
+} from '@/api/userController'
 import { useRouter } from 'vue-router'
-import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
+import { useLoginUserStore } from '@/stores/useLoginUserStore'
 import EditPasswordModal from '@/components/userinfo/EditPasswordModal.vue'
 import EditUserInfoModal from '@/components/userinfo/EditUserInfoModal.vue'
 import EditEmailModal from '@/components/userinfo/EditEmailModal.vue'
 import type { Rule } from 'ant-design-vue/es/form'
-import wechat from '@/assets/wechat.png'
 
 // 原有逻辑保持不变，新增以下内容
 const loading = ref(false)
@@ -267,8 +282,7 @@ const handleExchange = async () => {
   try {
     memberLoading.value = true
     // 调用后端接口
-    const res = await exchangeMember({
-      userId: loginUserStore.loginUser.id,
+    const res = await consumerMemberCode({
       code: formState.code,
     })
 
@@ -279,7 +293,7 @@ const handleExchange = async () => {
     } else {
       message.error(`兑换失败：${res.data.message}`)
     }
-  } catch (error) {
+  } catch {
     message.error('兑换请求失败，请稍后重试')
   } finally {
     memberLoading.value = false
@@ -310,8 +324,7 @@ const year = new Date().getFullYear()
 
 // 图表配置
 const options = computed(() => {
-  const optionsData = dataList.value.map((dayOfYear, index) => {
-    // 计算日期字符串 从第一天开始 加上 dayOfYear天 应该再减去一天
+  const optionsData = dataList.value.map((dayOfYear) => {
     const dateStr = dayjs(`${year}-01-01`)
       .add(dayOfYear - 1, 'day')
       .format('YYYY-MM-DD')
@@ -320,8 +333,8 @@ const options = computed(() => {
 
   return {
     tooltip: {
-      formatter: (params: any) => {
-        return `${params.value[0]}<br/>${params.value[1] ? '🎈 冒了一个泡' : '没有留下足迹'}`
+      formatter: (params: Record<string, any>) => {
+        return `${params.value[0]}<br/>${params.value[1] ? '🎈 已签到' : '未签到'}`
       },
       backgroundColor: 'rgba(255, 255, 255, 0.95)',
       borderColor: '#e2e8f0',
@@ -337,18 +350,28 @@ const options = computed(() => {
       min: 0,
       max: 1,
       inRange: {
-        // 颜色从灰色到浅绿色
-        color: ['#efefef', 'lightgreen'],
+        color: ['#f0f0f0', '#1890ff'],
       },
     },
     calendar: {
       range: year,
-      left: 20,
-      // 单元格自动宽度，高度为 16 像素
-      cellSize: ['auto', 16],
+      left: 30,
+      right: 30,
+      top: 20,
+      bottom: 20,
+      cellSize: ['auto', 20],
+      itemStyle: {
+        borderWidth: 2,
+        borderColor: '#fff',
+      },
       yearLabel: {
-        position: 'top',
-        formatter: `${year} 年签到记录`,
+        show: false,
+      },
+      dayLabel: {
+        color: '#666',
+      },
+      monthLabel: {
+        color: '#666',
       },
     },
     series: {
@@ -367,7 +390,7 @@ const fetchData = async () => {
     const day = getDayOfYear()
     dataList.value = res.data.data || []
     isSignIn.value = dataList.value.includes(day)
-  } catch (error) {
+  } catch {
     message.error('获取签到记录失败')
   }
 }
@@ -390,77 +413,111 @@ onMounted(() => {
 
 <style scoped>
 .user-info-page {
-  max-height: 450px;
   margin: 24px auto;
   padding: 0 24px;
-
-  .info-card {
-    border-radius: 8px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-    margin-bottom: 24px;
-
-    :deep(.ant-descriptions-item-label) {
-      color: #666;
-      width: 100px;
-    }
-
-    .info-value {
-      font-size: 15px;
-      color: #333;
-    }
-  }
-
-  .action-card {
-    min-height: 460px;
-    border-radius: 8px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-
-    .action-buttons {
-      display: grid;
-      gap: 12px;
-
-      .action-btn {
-        height: 48px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 15px;
-        border-radius: 6px;
-        transition: all 0.2s;
-
-        &:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-      }
-    }
-  }
 }
 
-/* 签到日历样式 */
-.sign-in-calendar {
+.info-card,
+.calendar-card,
+.action-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 24px;
   background: white;
-  border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  height: calc(100% - 348px);
+  transition: all 0.3s ease;
+}
+
+.info-card:hover,
+.calendar-card:hover,
+.action-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.info-card :deep(.ant-descriptions-item-label) {
+  color: #666;
+  width: 100px;
+}
+
+.info-card .info-value {
+  font-size: 15px;
+  color: #333;
+}
+
+.calendar-card {
+  margin-top: 24px;
+}
+
+.calendar-header {
+  margin-bottom: 24px;
+}
+
+.calendar-stats {
   display: flex;
-  flex-direction: column;
-  margin-top: 16px;
-  width: 100%;
+  justify-content: space-around;
+  padding: 16px 0;
+  border-radius: 8px;
   background: linear-gradient(135deg, rgba(14, 165, 233, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
 }
 
-.calendar-header h3 {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin: 0;
+.stats-item {
+  text-align: center;
+}
+
+.stats-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #1890ff;
+  margin-bottom: 4px;
+}
+
+.stats-label {
+  font-size: 14px;
+  color: #666;
 }
 
 .calendar-chart {
-  height: 200px;
+  height: 280px;
   width: 100% !important;
-  margin-top: 16px;
-  flex: 1;
+}
+
+.sign-btn {
+  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.sign-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+}
+
+.sign-btn:disabled {
+  background: #d9d9d9;
+  box-shadow: none;
+  transform: none;
+}
+
+.action-card {
+  min-height: 460px;
+}
+
+.action-buttons {
+  display: grid;
+  gap: 12px;
+}
+
+.action-btn {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 </style>
