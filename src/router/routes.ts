@@ -27,6 +27,7 @@ import UserInfoPage from '@/pages/user/UserInfoPage.vue'
 import MyPicturesPage from '@/pages/user/MyPicturesPage.vue'
 import MyMessagePage from '@/pages/user/MyMessagePage.vue'
 import MemberCodePage from '@/pages/admin/MemberCodePage.vue'
+import ExchangeMemberPage from '@/pages/member/ExchangeMemberPage.vue'
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -202,5 +203,10 @@ export const routes: Array<RouteRecordRaw> = [
     meta: {
       hideInMenu: true,
     },
+  },
+  {
+    path: '/member/exchange',
+    name: '会员兑换',
+    component: ExchangeMemberPage,
   },
 ]
